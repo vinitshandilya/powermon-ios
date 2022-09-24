@@ -11,14 +11,17 @@ import Foundation
 class MQTTManager: CocoaMQTTDelegate, ObservableObject {
     var reading: Reading = Reading()
     @Published var params: Params = Params()
+    @Published var isConnected = false // updates connection status bar in ui
     
     func mqtt(_ mqtt: CocoaMQTT, didConnectAck ack: CocoaMQTTConnAck) {
         print("Mqtt didConnectAck", ack.description)
         
         if ack.description == "accept" {
             mqtt.subscribe("outtopic")
+            self.isConnected = true
         } else {
             print("broker connection failed!")
+            self.isConnected = false
         }
         
     }
@@ -92,7 +95,7 @@ class MQTTManager: CocoaMQTTDelegate, ObservableObject {
         staticMQTT.mqttClient.password = ""
         staticMQTT.mqttClient.keepAlive = 60
         staticMQTT.mqttClient.delegate = self
-        staticMQTT.mqttClient.connect()
+        let _ = staticMQTT.mqttClient.connect()
         //staticMQTT.mqttClient.publish("intopic", withString: "hello")
         
     }

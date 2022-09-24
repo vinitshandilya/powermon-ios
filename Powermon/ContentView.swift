@@ -14,6 +14,7 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             VStack {
+                mqttmanager.isConnected ? ConnStatusBar(status: "connected") : ConnStatusBar(status: "offline")
                 Form {
                     Section(header: Text("Live reading")) {
                         
@@ -52,17 +53,18 @@ struct ContentView: View {
                 
                 List {
                     Section(header: Text("Trend")) {
-                        ForEach(usageHistory.dailyusage, id: \.self) { elem in
+                        ForEach(usageHistory.dailyusages, id: \._id) { usage in
                             HStack {
-                                Text(String(elem.timestamp))
+                                Text(String(usage.timestamp))
                                 Spacer()
-                                Text(String(elem.energyUsage)) + Text(" kWh")
+                                Text(String(usage.energyUsage)) + Text(" kWh")
                             }
                         }
                     }
                 }
             }
             .navigationTitle("Reading")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     ResetButton(mqttmgr: mqttmanager)

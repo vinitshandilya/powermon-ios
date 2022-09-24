@@ -9,7 +9,7 @@ import Foundation
 
 class UsageHistory: ObservableObject, Identifiable {
     
-    @Published var dailyusage: [DailyUsage] = []
+    @Published var dailyusages: [DailyUsage] = []
 
     func fetch() {
         let urlString = "https://pzem004t.herokuapp.com/getusagehistory"
@@ -27,11 +27,11 @@ class UsageHistory: ObservableObject, Identifiable {
                     let dailyusage = try decoder.decode([DailyUsage].self, from: data!)
                     print(dailyusage)
                     DispatchQueue.main.async {
-                        self?.dailyusage = dailyusage
+                        self?.dailyusages = dailyusage
                     }
                     
                 } catch {
-                    print("Error parsing JSON!")
+                    print("UsageHistory: Error parsing JSON!")
                 }
                 
             } else {
