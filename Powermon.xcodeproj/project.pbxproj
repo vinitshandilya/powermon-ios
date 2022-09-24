@@ -13,6 +13,12 @@
 		C79C3EA828DF2FA100EE8EAE /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C79C3EA728DF2FA100EE8EAE /* Preview Assets.xcassets */; };
 		C79C3EB028DF2FD900EE8EAE /* CocoaMQTT in Frameworks */ = {isa = PBXBuildFile; productRef = C79C3EAF28DF2FD900EE8EAE /* CocoaMQTT */; };
 		C79C3EB228DF2FD900EE8EAE /* CocoaMQTTWebSocket in Frameworks */ = {isa = PBXBuildFile; productRef = C79C3EB128DF2FD900EE8EAE /* CocoaMQTTWebSocket */; };
+		C79C3EB428DF33D400EE8EAE /* MQTTManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C3EB328DF33D400EE8EAE /* MQTTManager.swift */; };
+		C79C3EB628DF345100EE8EAE /* UsageHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C3EB528DF345100EE8EAE /* UsageHistory.swift */; };
+		C79C3EB828DF353200EE8EAE /* Reading.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C3EB728DF353200EE8EAE /* Reading.swift */; };
+		C79C3EBA28DF35BE00EE8EAE /* DailyUsage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C3EB928DF35BE00EE8EAE /* DailyUsage.swift */; };
+		C79C3EBC28DF35F700EE8EAE /* Params.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C3EBB28DF35F700EE8EAE /* Params.swift */; };
+		C79C3EBE28DF363B00EE8EAE /* ResetButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C3EBD28DF363B00EE8EAE /* ResetButton.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,6 +27,12 @@
 		C79C3EA228DF2F9F00EE8EAE /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		C79C3EA428DF2FA100EE8EAE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C79C3EA728DF2FA100EE8EAE /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		C79C3EB328DF33D400EE8EAE /* MQTTManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MQTTManager.swift; sourceTree = "<group>"; };
+		C79C3EB528DF345100EE8EAE /* UsageHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageHistory.swift; sourceTree = "<group>"; };
+		C79C3EB728DF353200EE8EAE /* Reading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reading.swift; sourceTree = "<group>"; };
+		C79C3EB928DF35BE00EE8EAE /* DailyUsage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyUsage.swift; sourceTree = "<group>"; };
+		C79C3EBB28DF35F700EE8EAE /* Params.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Params.swift; sourceTree = "<group>"; };
+		C79C3EBD28DF363B00EE8EAE /* ResetButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetButton.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,6 +71,12 @@
 				C79C3EA228DF2F9F00EE8EAE /* ContentView.swift */,
 				C79C3EA428DF2FA100EE8EAE /* Assets.xcassets */,
 				C79C3EA628DF2FA100EE8EAE /* Preview Content */,
+				C79C3EB328DF33D400EE8EAE /* MQTTManager.swift */,
+				C79C3EB528DF345100EE8EAE /* UsageHistory.swift */,
+				C79C3EB728DF353200EE8EAE /* Reading.swift */,
+				C79C3EB928DF35BE00EE8EAE /* DailyUsage.swift */,
+				C79C3EBB28DF35F700EE8EAE /* Params.swift */,
+				C79C3EBD28DF363B00EE8EAE /* ResetButton.swift */,
 			);
 			path = Powermon;
 			sourceTree = "<group>";
@@ -148,7 +166,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C79C3EB628DF345100EE8EAE /* UsageHistory.swift in Sources */,
+				C79C3EBC28DF35F700EE8EAE /* Params.swift in Sources */,
+				C79C3EBA28DF35BE00EE8EAE /* DailyUsage.swift in Sources */,
+				C79C3EBE28DF363B00EE8EAE /* ResetButton.swift in Sources */,
 				C79C3EA328DF2F9F00EE8EAE /* ContentView.swift in Sources */,
+				C79C3EB428DF33D400EE8EAE /* MQTTManager.swift in Sources */,
+				C79C3EB828DF353200EE8EAE /* Reading.swift in Sources */,
 				C79C3EA128DF2F9F00EE8EAE /* PowermonApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
