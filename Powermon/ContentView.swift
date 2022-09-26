@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
+    @Environment(\.scenePhase) var scenePhase // detects application lifecycle
     @StateObject var mqttmanager = MQTTManager()
     @StateObject var usageHistory: UsageHistory = UsageHistory()
     
@@ -72,8 +73,19 @@ struct ContentView: View {
             }
         }
         .onAppear {
-            mqttmanager.configureMQTT()
-            usageHistory.fetch()
+            //mqttmanager.configureMQTT()
+            //usageHistory.fetch()
+        }
+        .onChange(of: scenePhase) { newPhase in
+            if newPhase == .inactive {
+                print("Inactive")
+            } else if newPhase == .active {
+                print("Active")
+                mqttmanager.configureMQTT()
+                usageHistory.fetch()
+            } else if newPhase == .background {
+                print("Background")
+            }
         }
     }
 }
