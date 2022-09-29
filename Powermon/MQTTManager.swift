@@ -36,7 +36,7 @@ class MQTTManager: CocoaMQTTDelegate, ObservableObject {
     }
     
     func mqtt(_ mqtt: CocoaMQTT, didReceiveMessage message: CocoaMQTTMessage, id: UInt16) {
-        print("Message received in topic \(message.topic) with payload \(message.string!)")
+        // print("Message received in topic \(message.topic) with payload \(message.string!)")
         let readingData = message.string!
         
         // parse json

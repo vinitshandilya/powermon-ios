@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C71C58BA28E336A0007A22D6 /* ChartUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = C71C58B928E336A0007A22D6 /* ChartUI.swift */; };
+		C71C58BC28E3457D007A22D6 /* DataPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = C71C58BB28E3457D007A22D6 /* DataPoint.swift */; };
 		C79C3EA128DF2F9F00EE8EAE /* PowermonApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C3EA028DF2F9F00EE8EAE /* PowermonApp.swift */; };
 		C79C3EA328DF2F9F00EE8EAE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C3EA228DF2F9F00EE8EAE /* ContentView.swift */; };
 		C79C3EA528DF2FA100EE8EAE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C79C3EA428DF2FA100EE8EAE /* Assets.xcassets */; };
@@ -23,6 +25,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		C71C58B928E336A0007A22D6 /* ChartUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartUI.swift; sourceTree = "<group>"; };
+		C71C58BB28E3457D007A22D6 /* DataPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataPoint.swift; sourceTree = "<group>"; };
 		C79C3E9D28DF2F9F00EE8EAE /* Powermon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Powermon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C79C3EA028DF2F9F00EE8EAE /* PowermonApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowermonApp.swift; sourceTree = "<group>"; };
 		C79C3EA228DF2F9F00EE8EAE /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -80,6 +84,8 @@
 				C79C3EBB28DF35F700EE8EAE /* Params.swift */,
 				C79C3EBD28DF363B00EE8EAE /* ResetButton.swift */,
 				C79C3EBF28DF753700EE8EAE /* ConnStatusBar.swift */,
+				C71C58B928E336A0007A22D6 /* ChartUI.swift */,
+				C71C58BB28E3457D007A22D6 /* DataPoint.swift */,
 			);
 			path = Powermon;
 			sourceTree = "<group>";
@@ -173,6 +179,8 @@
 				C79C3EBC28DF35F700EE8EAE /* Params.swift in Sources */,
 				C79C3EBA28DF35BE00EE8EAE /* DailyUsage.swift in Sources */,
 				C79C3EBE28DF363B00EE8EAE /* ResetButton.swift in Sources */,
+				C71C58BA28E336A0007A22D6 /* ChartUI.swift in Sources */,
+				C71C58BC28E3457D007A22D6 /* DataPoint.swift in Sources */,
 				C79C3EA328DF2F9F00EE8EAE /* ContentView.swift in Sources */,
 				C79C3EB428DF33D400EE8EAE /* MQTTManager.swift in Sources */,
 				C79C3EC028DF753700EE8EAE /* ConnStatusBar.swift in Sources */,

@@ -16,6 +16,7 @@ struct ContentView: View {
         NavigationView {
             VStack {
                 mqttmanager.isConnected ? ConnStatusBar(status: "connected") : ConnStatusBar(status: "offline")
+                //ChartUI(lineseries: datapoints.getSeriesData())
                 Form {
                     Section(header: Text("Live reading")) {
                         
@@ -65,10 +66,17 @@ struct ContentView: View {
                 }
             }
             .navigationTitle("Reading")
-            .navigationBarTitleDisplayMode(.inline)
+            //.navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     ResetButton(mqttmgr: mqttmanager)
+                    // Pass line variable from UsageHistory class to ChartUI.
+                    // line is a published variable in UsageHistory, and we
+                    // are watching this class for any changes using @State-
+                    // -Observer wrapper. :-)
+                    NavigationLink(destination: ChartUI(lineseries: usageHistory.line)) {
+                        Text("Analyse")
+                    }
                 }
             }
         }
@@ -83,6 +91,7 @@ struct ContentView: View {
                 print("Active")
                 mqttmanager.configureMQTT()
                 usageHistory.fetch()
+                
             } else if newPhase == .background {
                 print("Background")
             }
@@ -100,5 +109,3 @@ struct ContentView_Previews: PreviewProvider {
         }
     }
 }
-
-

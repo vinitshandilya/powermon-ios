@@ -29,9 +29,6 @@ struct ConnStatusBar: View {
                 .background(Color.gray)
         }
     }
-        
-        
-    
 }
 
 struct ConnStatusBar_Previews: PreviewProvider {

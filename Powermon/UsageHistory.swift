@@ -10,6 +10,7 @@ import Foundation
 class UsageHistory: ObservableObject, Identifiable {
     
     @Published var dailyusages: [DailyUsage] = []
+    @Published var line: [DataPoint] = []
 
     func fetch() {
         let urlString = "https://pzem004t.herokuapp.com/getusagehistory"
@@ -25,9 +26,22 @@ class UsageHistory: ObservableObject, Identifiable {
                 let decoder = JSONDecoder()
                 do {
                     let dailyusage = try decoder.decode([DailyUsage].self, from: data!)
-                    print(dailyusage)
+                    //print(dailyusage)
                     DispatchQueue.main.async {
                         self?.dailyusages = dailyusage
+                        self?.line.removeAll() // Clear array otherwise, data gets duplicated in chart
+                        // This also needs to run on UI thread.
+                    }
+                    
+                    // Fill in the line data from dailyusage array
+                    for i in dailyusage.reversed() {
+                        if (dailyusage.firstIndex(of: i) ?? 0) % 60 == 0 {
+                            DispatchQueue.main.async {
+                                //print(DataPoint(timestamp: i.timestamp, usage: Double(i.energyUsage) ?? 0))
+                                self?.line.append(DataPoint(timestamp: i.timestamp, usage: Double(i.energyUsage) ?? 0))
+                            }
+                        }
+                        
                     }
                     
                 } catch {
