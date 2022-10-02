@@ -31,7 +31,6 @@ class UsageHistory: ObservableObject, Identifiable {
                         self?.line.removeAll() // Clear array otherwise, data gets duplicated in chart
                         self?.line = dailyusages.reversed().enumerated().compactMap { $0.offset % step == 0 ? DataPoint(timestamp: $0.element.timestamp, usage: Double($0.element.energyUsage) ?? 0) : nil }
                     }
-                    
                 } catch {
                     print("UsageHistory: Error parsing JSON!")
                 }

@@ -14,17 +14,20 @@ struct ConnStatusBar: View {
         switch status {
         case "connected":
             return Text(status)
-                .frame(maxWidth: .infinity, maxHeight: 30)
+                .padding()
+                .frame(maxWidth: .infinity, maxHeight: 30, alignment: .trailing)
                 .foregroundColor(.white)
-                .background(.green)
+                .background(Color("ConnectedColor"))
         case "offline":
             return Text(status)
-                .frame(maxWidth: .infinity, maxHeight: 30)
+                .padding()
+                .frame(maxWidth: .infinity, maxHeight: 30, alignment: .trailing)
                 .foregroundColor(.white)
-                .background(.red)
+                .background(Color("DisconnectedColor"))
         default:
             return Text("unknown")
-                .frame(maxWidth: .infinity, maxHeight: 30)
+                .padding()
+                .frame(maxWidth: .infinity, maxHeight: 30, alignment: .trailing)
                 .foregroundColor(.white)
                 .background(Color.gray)
         }
