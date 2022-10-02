@@ -53,15 +53,24 @@ struct ContentView: View {
                     }
                 }
                 
-                List {
-                    Section(header: Text("Trend")) {
-                        ForEach(usageHistory.dailyusages, id: \._id) { usage in
-                            HStack {
-                                Text(String(usage.timestamp))
-                                Spacer()
-                                Text(String(usage.energyUsage)) + Text(" kWh")
+                ZStack {
+                    
+                    List {
+                        Section(header: Text("Hourly Trend for the month")) {
+    //                      // line is an array of DataPoints
+                            ForEach(usageHistory.line.reversed(), id: \.id) { datapoint in
+                                HStack {
+                                    Text(String(datapoint.timestamp))
+                                    Spacer()
+                                    Text(String(datapoint.usage)) + Text(" kWh")
+                                }
                             }
                         }
+                    }
+                    if usageHistory.line.count <= 0 {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .accentColor))
+                            //.scaleEffect(3)
                     }
                 }
             }
@@ -74,8 +83,10 @@ struct ContentView: View {
                     // line is a published variable in UsageHistory, and we
                     // are watching this class for any changes using @State-
                     // -Observer wrapper. :-)
-                    NavigationLink(destination: ChartUI(lineseries: usageHistory.line)) {
-                        Text("Analyse").foregroundColor(.white)
+                    if usageHistory.line.count > 0 {
+                        NavigationLink(destination: ChartUI(lineseries: usageHistory.line)) {
+                            Text("Analyse").foregroundColor(.white)
+                        }
                     }
                 }
             }

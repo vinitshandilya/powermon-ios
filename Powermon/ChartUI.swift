@@ -8,23 +8,10 @@
 import Charts
 import SwiftUI
 
-class SliderPosition: ObservableObject {
-    var pos: Float
-    
-    init(pos: Float) {
-        self.pos = pos
-    }
-    
-    func setPosition(pos: Float) {
-        self.pos = pos
-    }
-}
-
 struct ChartUI: View {
     
     let lineseries: [DataPoint]
     @State private var sliderValue : Float = 0.0
-    @StateObject var sliderposition: SliderPosition = SliderPosition(pos: 0.0)
     
     var body: some View {
         ScrollView {
@@ -33,7 +20,7 @@ struct ChartUI: View {
                 .foregroundColor(.gray)
             Divider()
             Chart {
-                ForEach(lineseries.suffix(31-Int(sliderValue))) { point in // Server also sends 31 data points (configurable)
+                ForEach(lineseries.suffix(31-Int(sliderValue))) { point in
                     LineMark(
                         x: .value("Timestamp", point.timestamp),
                         y: .value("Usage", point.usage)
@@ -59,14 +46,14 @@ struct ChartUI: View {
             HStack {
                 Text("From: \(lineseries[Int(sliderValue)].timestamp)")
                 Spacer()
-                Text("To: \(lineseries.last?.timestamp ?? "-1")")
+                Text("To: \(lineseries.last?.timestamp ?? "-")")
             }
             .padding(.horizontal)
             .font(.system(size: 12))
             
             VStack {
                 //Text("Current Slider Value: \(Int(sliderValue))")
-                Slider(value: $sliderValue, in: 0...24) { // 31-7=24 to keep at least 7 data points
+                Slider(value: $sliderValue, in: 0...24) { // 31-7 = 24 datapoints to keep at least
                     Text("Usage")
                 } minimumValueLabel: {
                     //Text("Month").fontWeight(.thin)
