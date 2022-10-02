@@ -35,11 +35,9 @@ class UsageHistory: ObservableObject, Identifiable {
                     
                     // Fill in the line data from dailyusage array
                     for i in dailyusage.reversed() {
-                        if (dailyusage.firstIndex(of: i) ?? 0) % 60 == 0 {
-                            DispatchQueue.main.async {
-                                //print(DataPoint(timestamp: i.timestamp, usage: Double(i.energyUsage) ?? 0))
-                                self?.line.append(DataPoint(timestamp: i.timestamp, usage: Double(i.energyUsage) ?? 0))
-                            }
+                        DispatchQueue.main.async {
+                            //print(DataPoint(timestamp: i.timestamp, usage: Double(i.energyUsage) ?? 0))
+                            self?.line.append(DataPoint(timestamp: i.timestamp, usage: Double(i.energyUsage) ?? 0))
                         }
                         
                     }

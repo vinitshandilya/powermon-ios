@@ -75,7 +75,7 @@ struct ContentView: View {
                     // are watching this class for any changes using @State-
                     // -Observer wrapper. :-)
                     NavigationLink(destination: ChartUI(lineseries: usageHistory.line)) {
-                        Text("Analyse")
+                        Text("Analyse").foregroundColor(.white)
                     }
                 }
             }

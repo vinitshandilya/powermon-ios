@@ -8,22 +8,37 @@
 import Charts
 import SwiftUI
 
+class SliderPosition: ObservableObject {
+    var pos: Float
+    
+    init(pos: Float) {
+        self.pos = pos
+    }
+    
+    func setPosition(pos: Float) {
+        self.pos = pos
+    }
+}
+
 struct ChartUI: View {
     
     let lineseries: [DataPoint]
+    @State private var sliderValue : Float = 0.0
+    @StateObject var sliderposition: SliderPosition = SliderPosition(pos: 0.0)
     
     var body: some View {
-        VStack {
+        ScrollView {
             Text("Energy Usage (kWh)")
                 .font(.system(size: 25))
                 .foregroundColor(.gray)
             Divider()
             Chart {
-                ForEach(lineseries) { point in
+                ForEach(lineseries.suffix(31-Int(sliderValue))) { point in // Server also sends 31 data points (configurable)
                     LineMark(
                         x: .value("Timestamp", point.timestamp),
                         y: .value("Usage", point.usage)
                     )
+                    .interpolationMethod(.catmullRom)
                 }
                 //.foregroundStyle(by: .value("Energy", "Usage"))
                 .symbol(by: .value("Energy", "kWh"))
@@ -40,11 +55,30 @@ struct ChartUI: View {
                     .background(.blue.opacity(0.1))
                 //.foregroundColor(Color.green)
             }
-            Divider()
-            ScrollView {
-                Text("This shows the trend of electricity consumption in the last 10 days. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. This shows the trend of electricity consumption in the last 10 days. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
+            
+            HStack {
+                Text("From: \(lineseries[Int(sliderValue)].timestamp)")
+                Spacer()
+                Text("To: \(lineseries.last?.timestamp ?? "-1")")
+            }
+            .padding(.horizontal)
+            .font(.system(size: 12))
+            
+            VStack {
+                //Text("Current Slider Value: \(Int(sliderValue))")
+                Slider(value: $sliderValue, in: 0...24) { // 31-7=24 to keep at least 7 data points
+                    Text("Usage")
+                } minimumValueLabel: {
+                    //Text("Month").fontWeight(.thin)
+                } maximumValueLabel: {
+                    //Text("Day").fontWeight(.thin)
+                }.tint(.accentColor)
                     .padding()
             }
+            
+            Divider()
+            Text("This shows the trend of electricity consumption in the last 31 minutes. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. This shows the trend of electricity consumption in the last 31 minutes. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
+                .padding()
             Spacer()
         }
     }

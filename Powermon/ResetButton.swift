@@ -16,6 +16,8 @@ struct ResetButton: View {
         Button("Reset", role: .destructive) {
             isPresentingConfirm = true
         }
+        .buttonStyle(.borderedProminent)
+        .tint(.red)
         .confirmationDialog("Are you sure?", isPresented: $isPresentingConfirm) {
             // publishing "1" on intopic will reset the module
             Button("Reset usage?", role: .destructive) { mqttmgr.sendMessage(topic: "intopic", message: "1")}
