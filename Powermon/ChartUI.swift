@@ -11,6 +11,8 @@ import SwiftUI
 struct ChartUI: View {
     
     let lineseries: [DataPoint]
+    let MAX_DATA_SAMPLE: Int = 31 // 31 datapoints in the chart
+    let MIN_DATA_SAMPLE: Int = 7 // show at least this much datapoints when slider is fully zoomed
     @State private var sliderValue : Float = 0.0
     
     var body: some View {
@@ -20,7 +22,7 @@ struct ChartUI: View {
                 .foregroundColor(.gray)
             Divider()
             Chart {
-                ForEach(lineseries.suffix(31-Int(sliderValue))) { point in
+                ForEach(lineseries.suffix(MAX_DATA_SAMPLE-Int(sliderValue))) { point in
                     LineMark(
                         x: .value("Timestamp", point.timestamp),
                         y: .value("Usage", point.usage)
@@ -53,7 +55,7 @@ struct ChartUI: View {
             
             VStack {
                 //Text("Current Slider Value: \(Int(sliderValue))")
-                Slider(value: $sliderValue, in: 0...24) { // 31-7 = 24 datapoints to keep at least
+                Slider(value: $sliderValue, in: 0...Float(MAX_DATA_SAMPLE-MIN_DATA_SAMPLE)) { // 31-7 = 24 datapoints to keep at least
                     Text("Usage")
                 } minimumValueLabel: {
                     //Text("Month").fontWeight(.thin)

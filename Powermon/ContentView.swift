@@ -15,7 +15,8 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             VStack {
-                mqttmanager.isConnected ? ConnStatusBar(status: "connected") : ConnStatusBar(status: "offline")
+                mqttmanager.isConnected ? (mqttmanager.alarm ? ConnStatusBar(status: "highusage") : ConnStatusBar(status: "nominal")) : ConnStatusBar(status: "offline")
+                
                 //ChartUI(lineseries: datapoints.getSeriesData())
                 Form {
                     Section(header: Text("Live reading")) {

@@ -9,9 +9,15 @@ import CocoaMQTT
 import Foundation
 
 class MQTTManager: CocoaMQTTDelegate, ObservableObject {
+    
+    let WAIT_CHECK: Int = 5 // wait for this seconds to determine if usage is high
+    let ALARM_THRESH: Double = 300 // high usage alarm threshold
+    
     var reading: Reading = Reading()
     @Published var params: Params = Params()
     @Published var isConnected = false // updates connection status bar in ui
+    var slidingWindow: [Params] = []
+    @Published var alarm: Bool = false
     
     func mqtt(_ mqtt: CocoaMQTT, didConnectAck ack: CocoaMQTTConnAck) {
         print("Mqtt didConnectAck", ack.description)
@@ -59,6 +65,17 @@ class MQTTManager: CocoaMQTTDelegate, ObservableObject {
         params.energy = Double(reading.Energy)!
         params.frequency = Double(reading.Frequency)!
         params.pf = Double(reading.PF)!
+        
+        slidingWindow.append(params) // consider only last 30 samples for 30 seconds
+        if slidingWindow.count > WAIT_CHECK {
+            slidingWindow.remove(at: 0)
+        }
+        
+        if slidingWindow.allSatisfy({ $0.power > ALARM_THRESH }) {
+            alarm = true
+        } else {
+            alarm = false
+        }
     }
     
     func mqtt(_ mqtt: CocoaMQTT, didSubscribeTopics success: NSDictionary, failed: [String]) {
