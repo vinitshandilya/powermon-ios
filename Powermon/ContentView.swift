@@ -17,42 +17,42 @@ struct ContentView: View {
             VStack {
                 mqttmanager.isConnected ? (mqttmanager.alarm ? ConnStatusBar(status: "highusage") : ConnStatusBar(status: "nominal")) : ConnStatusBar(status: "offline")
                 
-                //ChartUI(lineseries: datapoints.getSeriesData())
                 Form {
                     Section(header: Text("Live reading")) {
                         
                         HStack {
-                            Label("Power", systemImage: "bolt.circle")
+                            Label("Power", systemImage: "bolt.circle").fontWeight(.heavy)
                             Spacer()
-                            mqttmanager.params.power > 400 ? (Text(String(mqttmanager.params.power)).foregroundColor(Color.red) + Text(" W").foregroundColor(Color.red)) : Text(String(mqttmanager.params.power)) + Text(" W")
+                            mqttmanager.params.power > 400 ? (Text(String(mqttmanager.params.power)).foregroundColor(Color.red).fontWeight(.light) + Text(" W").foregroundColor(Color.red)).fontWeight(.light) : Text(String(mqttmanager.params.power)).fontWeight(.light) + Text(" W").fontWeight(.light)
                         }
                         HStack {
-                            Label("Voltage", systemImage: "powerplug")
+                            Label("Voltage", systemImage: "powerplug").fontWeight(.heavy)
                             Spacer()
-                            Text(String(mqttmanager.params.voltage)) + Text(" V")
+                            Text(String(mqttmanager.params.voltage)).fontWeight(.light) + Text(" V").fontWeight(.light)
                         }
                         HStack {
-                            Label("Current", systemImage: "alternatingcurrent")
+                            Label("Current", systemImage: "alternatingcurrent").fontWeight(.heavy)
                             Spacer()
-                            Text(String(mqttmanager.params.current)) + Text(" A")
+                            Text(String(mqttmanager.params.current)).fontWeight(.light) + Text(" A").fontWeight(.light)
                         }
                         HStack {
-                            Label("Units", systemImage: "barometer")
+                            Label("Units", systemImage: "barometer").fontWeight(.heavy)
                             Spacer()
-                            Text(String(mqttmanager.params.energy)) + Text(" kWh")
+                            Text(String(mqttmanager.params.energy)).fontWeight(.light) + Text(" kWh").fontWeight(.light)
                         }
                         HStack {
-                            Label("Freq", systemImage: "waveform")
+                            Label("Freq", systemImage: "waveform").fontWeight(.heavy)
                             Spacer()
-                            Text(String(mqttmanager.params.frequency)) + Text(" Hz")
+                            Text(String(mqttmanager.params.frequency)).fontWeight(.light) + Text(" Hz").fontWeight(.light)
                         }
                         HStack {
-                            Label("PF", systemImage: "poweroff")
+                            Label("PF", systemImage: "poweroff").fontWeight(.heavy)
                             Spacer()
-                            Text(String(mqttmanager.params.pf))
+                            Text(String(mqttmanager.params.pf)).fontWeight(.light)
                         }
                     }
                 }
+                .font(.footnote)
                 
                 ZStack {
                     
@@ -65,6 +65,7 @@ struct ContentView: View {
                                     Spacer()
                                     Text(String(datapoint.usage)) + Text(" kWh")
                                 }
+                                .font(.footnote)
                             }
                         }
                     }
