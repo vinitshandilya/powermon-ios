@@ -76,7 +76,7 @@ struct ContentView: View {
                     }
                 }
             }
-            .navigationTitle("Reading")
+            .navigationTitle("Powermon")
             //.navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {

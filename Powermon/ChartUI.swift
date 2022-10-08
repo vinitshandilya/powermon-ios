@@ -11,34 +11,33 @@ import SwiftUI
 struct ChartUI: View {
     
     let lineseries: [DataPoint]
-    let MAX_DATA_SAMPLE: Int = 31 // 31 datapoints in the chart
-    let MIN_DATA_SAMPLE: Int = 7 // show at least this much datapoints when slider is fully zoomed
     @State private var sliderValue : Float = 0.0
     
     var body: some View {
         ScrollView {
-            Text("Energy Usage (kWh)")
-                .font(.system(size: 25))
-                .foregroundColor(.gray)
+            Text("Energy usage by hour")
+                .font(.system(size: 20))
+                .opacity(0.5)
             Divider()
+            let arr = lineseries[Int(sliderValue)..<min(Int(sliderValue)+7, lineseries.count)]
             Chart {
-                ForEach(lineseries.suffix(MAX_DATA_SAMPLE-Int(sliderValue))) { point in
-                    LineMark(
-                        x: .value("Timestamp", point.timestamp),
+                ForEach(arr) { point in
+                    BarMark(
+                        x: .value("Timestamp", getFormattedLabel(str: point.timestamp)),
                         y: .value("Usage", point.usage)
                     )
-                    .interpolationMethod(.catmullRom)
+                    .annotation(position: .overlay, alignment: .top) {
+                        Text("\(point.usage, format: .number.precision(.fractionLength(1)))")
+                            .foregroundColor(.white)
+                            .font(.system(size: 8, weight: .heavy, design: .default))
+                      
+                    }
                 }
                 //.foregroundStyle(by: .value("Energy", "Usage"))
                 .symbol(by: .value("Energy", "kWh"))
             }
             //.chartYScale(domain: 869.5...871.5)
             .frame(height: 400)
-            .safeAreaInset(edge: .top, alignment: .center, spacing: 0) {
-                Color.clear
-                    .frame(height: 20)
-                    .background(Material.bar)
-            }
             .chartPlotStyle { plotArea in
                 plotArea
                     .background(.blue.opacity(0.1))
@@ -46,30 +45,46 @@ struct ChartUI: View {
             }
             
             HStack {
-                Text("From: \(lineseries[Int(sliderValue)].timestamp)")
+                Text("From: \(arr[Int(sliderValue)].timestamp)")
                 Spacer()
-                Text("To: \(lineseries.last?.timestamp ?? "-")")
+                Text("To: \(arr.last?.timestamp ?? "-")")
             }
             .padding(.horizontal)
             .font(.system(size: 12))
+            .opacity(0.5)
             
             VStack {
-                //Text("Current Slider Value: \(Int(sliderValue))")
-                Slider(value: $sliderValue, in: 0...Float(MAX_DATA_SAMPLE-MIN_DATA_SAMPLE)) { // 31-7 = 24 datapoints to keep at least
+                // if lineseries has less than 7 elements, don't show slider bar
+                Float(max(0, lineseries.count-7)) > 0 ?
+                Slider(value: $sliderValue, in: 0...Float(max(0, lineseries.count-7))) {
                     Text("Usage")
                 } minimumValueLabel: {
                     //Text("Month").fontWeight(.thin)
                 } maximumValueLabel: {
                     //Text("Day").fontWeight(.thin)
-                }.tint(.accentColor)
-                    .padding()
+                }
+                .tint(.accentColor)
+                .padding()
+                .onAppear {
+                    self.sliderValue = Float(max(0, lineseries.count-7))
+                }
+                : nil
+                
             }
             
             Divider()
-            Text("This shows the trend of electricity consumption in the last 31 minutes. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. This shows the trend of electricity consumption in the last 31 minutes. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
+            Text("This shows the trend of electricity consumption in the 7 hours. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. This shows the trend of electricity consumption in the last 7 hours. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
                 .padding()
+                .opacity(0.7)
             Spacer()
         }
+    }
+    
+    func getFormattedLabel(str: String) -> String {
+        let arr = str.split(separator: " ")
+        //let mmdd = arr[0].dropLast(5)
+        let time = arr[1].dropLast(3)
+        return "\(time)\(arr[2])"
     }
 }
 
@@ -77,17 +92,15 @@ struct ChartUI_Previews: PreviewProvider {
     
     static var previews: some View {
         ChartUI(lineseries: [
-            DataPoint(timestamp: "1/2/3", usage: 843.0),
-            DataPoint(timestamp: "2/2/3", usage: 743.3),
-            DataPoint(timestamp: "3/2/3", usage: 643.0),
-            DataPoint(timestamp: "4/2/3", usage: 843.0),
-            DataPoint(timestamp: "5/2/3", usage: 200.0),
-            DataPoint(timestamp: "6/2/3", usage: 730.0),
-            DataPoint(timestamp: "7/2/3", usage: 425.0),
-            DataPoint(timestamp: "8/2/3", usage: 333.0),
-            DataPoint(timestamp: "9/2/3", usage: 765.0),
-            DataPoint(timestamp: "10/2/3", usage: 110.2),
-            DataPoint(timestamp: "11/2/3", usage: 430.2)
+            DataPoint(timestamp: "9/30/2022 3:37:59 AM", usage: 643.0),
+            DataPoint(timestamp: "10/1/2022 4:37:59 AM", usage: 843.0),
+            DataPoint(timestamp: "10/2/2022 5:37:59 AM", usage: 200.0),
+            DataPoint(timestamp: "10/3/2022 6:37:59 AM", usage: 730.0),
+            DataPoint(timestamp: "10/4/2022 7:37:59 AM", usage: 425.0),
+            DataPoint(timestamp: "10/5/2022 8:37:59 AM", usage: 333.0),
+            DataPoint(timestamp: "10/6/2022 9:37:59 AM", usage: 765.0),
+            DataPoint(timestamp: "10/7/2022 10:37:59 AM", usage: 110.2),
+            DataPoint(timestamp: "10/8/2022 11:37:59 AM", usage: 430.2)
         ])
     }
 }
