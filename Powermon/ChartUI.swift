@@ -6,6 +6,7 @@
 //
 
 import Charts
+import Foundation
 import SwiftUI
 
 struct ChartUI: View {
@@ -17,13 +18,14 @@ struct ChartUI: View {
         ScrollView {
             Text("Energy usage by hour")
                 .font(.system(size: 20))
-                .opacity(0.5)
+                .opacity(0.7)
             Divider()
             let arr = lineseries[Int(sliderValue)..<min(Int(sliderValue)+7, lineseries.count)]
             Chart {
                 ForEach(arr) { point in
                     BarMark(
-                        x: .value("Timestamp", getFormattedLabel(str: point.timestamp)),
+                        // x: .value("Timestamp", getFormattedLabel(str: point.timestamp, format: "hh:mm a")),
+                        x: .value("Timestamp", TimestampFormatter(timestamp: point.timestamp, format: "h:mm a").getFormattedLabel()),
                         y: .value("Usage", point.usage)
                     )
                     .annotation(position: .overlay, alignment: .top) {
@@ -33,7 +35,6 @@ struct ChartUI: View {
                       
                     }
                 }
-                //.foregroundStyle(by: .value("Energy", "Usage"))
                 .symbol(by: .value("Energy", "kWh"))
             }
             //.chartYScale(domain: 869.5...871.5)
@@ -45,9 +46,9 @@ struct ChartUI: View {
             }
             
             HStack {
-                Text("From: \(arr[Int(sliderValue)].timestamp)")
+                Text("From: \(TimestampFormatter(timestamp: arr[Int(sliderValue)].timestamp, format: "MMM d, h:mm a").getFormattedLabel())")
                 Spacer()
-                Text("To: \(arr.last?.timestamp ?? "-")")
+                Text("To: \(TimestampFormatter(timestamp: (arr.last?.timestamp ?? ""), format: "MMM d, h:mm a").getFormattedLabel())")
             }
             .padding(.horizontal)
             .font(.system(size: 12))
@@ -78,13 +79,6 @@ struct ChartUI: View {
                 .opacity(0.7)
             Spacer()
         }
-    }
-    
-    func getFormattedLabel(str: String) -> String {
-        let arr = str.split(separator: " ")
-        //let mmdd = arr[0].dropLast(5)
-        let time = arr[1].dropLast(3)
-        return "\(time)\(arr[2])"
     }
 }
 

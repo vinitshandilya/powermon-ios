@@ -55,13 +55,13 @@ struct ContentView: View {
                 .font(.footnote)
                 
                 ZStack {
-                    
                     List {
-                        Section(header: Text("Hourly Trend for the month")) {
-    //                      // line is an array of DataPoints
+                        Section(header: Text("Hourly trend for the month")) {
                             ForEach(usageHistory.line.reversed(), id: \.id) { datapoint in
                                 HStack {
-                                    Text(String(datapoint.timestamp))
+                                    // Converts to server's utc timezone to local timezone as well
+                                    Text(TimestampFormatter(timestamp: String(datapoint.timestamp),
+                                                            format: "MMM d yyyy, h:mm a").getFormattedLabel())
                                     Spacer()
                                     Text(String(datapoint.usage)) + Text(" kWh")
                                 }
@@ -72,7 +72,6 @@ struct ContentView: View {
                     if usageHistory.line.count <= 0 {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle(tint: .accentColor))
-                            //.scaleEffect(3)
                     }
                 }
             }

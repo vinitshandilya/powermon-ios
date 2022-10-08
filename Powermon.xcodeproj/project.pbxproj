@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		C71C58BA28E336A0007A22D6 /* ChartUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = C71C58B928E336A0007A22D6 /* ChartUI.swift */; };
 		C71C58BC28E3457D007A22D6 /* DataPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = C71C58BB28E3457D007A22D6 /* DataPoint.swift */; };
+		C72DCA0F28F1C1130026C506 /* TimeStampFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72DCA0E28F1C1130026C506 /* TimeStampFormatter.swift */; };
 		C79C3EA128DF2F9F00EE8EAE /* PowermonApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C3EA028DF2F9F00EE8EAE /* PowermonApp.swift */; };
 		C79C3EA328DF2F9F00EE8EAE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C3EA228DF2F9F00EE8EAE /* ContentView.swift */; };
 		C79C3EA528DF2FA100EE8EAE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C79C3EA428DF2FA100EE8EAE /* Assets.xcassets */; };
@@ -27,6 +28,7 @@
 /* Begin PBXFileReference section */
 		C71C58B928E336A0007A22D6 /* ChartUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartUI.swift; sourceTree = "<group>"; };
 		C71C58BB28E3457D007A22D6 /* DataPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataPoint.swift; sourceTree = "<group>"; };
+		C72DCA0E28F1C1130026C506 /* TimeStampFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeStampFormatter.swift; sourceTree = "<group>"; };
 		C79C3E9D28DF2F9F00EE8EAE /* Powermon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Powermon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C79C3EA028DF2F9F00EE8EAE /* PowermonApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowermonApp.swift; sourceTree = "<group>"; };
 		C79C3EA228DF2F9F00EE8EAE /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -75,6 +77,7 @@
 			children = (
 				C79C3EA028DF2F9F00EE8EAE /* PowermonApp.swift */,
 				C79C3EA228DF2F9F00EE8EAE /* ContentView.swift */,
+				C72DCA0E28F1C1130026C506 /* TimeStampFormatter.swift */,
 				C79C3EA428DF2FA100EE8EAE /* Assets.xcassets */,
 				C79C3EA628DF2FA100EE8EAE /* Preview Content */,
 				C79C3EB328DF33D400EE8EAE /* MQTTManager.swift */,
@@ -186,6 +189,7 @@
 				C79C3EC028DF753700EE8EAE /* ConnStatusBar.swift in Sources */,
 				C79C3EB828DF353200EE8EAE /* Reading.swift in Sources */,
 				C79C3EA128DF2F9F00EE8EAE /* PowermonApp.swift in Sources */,
+				C72DCA0F28F1C1130026C506 /* TimeStampFormatter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
