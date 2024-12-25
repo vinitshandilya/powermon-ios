@@ -12,43 +12,45 @@ struct LoginView: View {
     @State private var username: String = ""
     @State private var password: String = ""
     @State private var message: String = ""
-    // @State private var navigateToHome: Bool = false
     @State private var user_id: String = ""
 
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 20) {
-                Text("Login")
-                    .font(.largeTitle)
-                    .bold()
+        VStack(spacing: 20) {
+            Text("Login")
+                .font(.largeTitle)
+                .bold()
 
-                TextField("Username", text: $username)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding(.horizontal)
+            TextField("Username", text: $username)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .padding(.horizontal)
 
-                SecureField("Password", text: $password)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding(.horizontal)
+            SecureField("Password", text: $password)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .padding(.horizontal)
 
-                Button("Login") {
-                    loginUser()
-                }
-                .buttonStyle(.borderedProminent)
-
-                NavigationLink(destination: CreateAccountView()) {
-                    Text("Create a new account")
-                        .foregroundColor(.blue)
-                }
-
-//                NavigationLink(destination: UserHome(), isActive: $navigateToHome) {
-//                    EmptyView()
-//                }
-
-                Text(message)
-                    .foregroundColor(.red)
+            Button("Login") {
+                loginUser()
             }
-            .padding()
+            .buttonStyle(.borderedProminent)
+
+//            NavigationLink(destination: CreateAccountView()) {
+//                Text("Create a new account")
+//                    .foregroundColor(.blue)
+//            }
+            
+            Text("Create a new account")
+                .font(.footnote)
+                .foregroundColor(.blue)
+                .padding(.top, 10)
+                .onTapGesture {
+                    print("Navigating to create new account page")
+                    navigateToCreateAccountPage()
+            }
+
+            Text(message)
+                .foregroundColor(.red)
         }
+        .padding()
     }
 
     func loginUser() {
@@ -115,10 +117,18 @@ struct LoginView: View {
         window.rootViewController = UIHostingController(rootView: UserHome())
         window.makeKeyAndVisible()
     }
+    
+    func navigateToCreateAccountPage() {
+        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = scene.windows.first else {
+            print("Failed to get the key window")
+            return
+        }
+        window.rootViewController = UIHostingController(rootView: CreateAccountView())
+        window.makeKeyAndVisible()
+    }
 
 }
-
-
 
 #Preview {
     LoginView()

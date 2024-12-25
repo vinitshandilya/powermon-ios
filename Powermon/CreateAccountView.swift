@@ -12,7 +12,7 @@ struct CreateAccountView: View {
     @State private var username: String = ""
     @State private var password: String = ""
     @State private var message: String = ""
-    @State private var navigateToHome: Bool = false
+    // @State private var navigateToHome: Bool = false
 
     var body: some View {
         VStack(spacing: 20) {
@@ -33,9 +33,9 @@ struct CreateAccountView: View {
             }
             .buttonStyle(.borderedProminent)
 
-            NavigationLink(destination: UserHome(), isActive: $navigateToHome) {
-                EmptyView()
-            }
+//            NavigationLink(destination: UserHome(), isActive: $navigateToHome) {
+//                EmptyView()
+//            }
 
             Text(message)
                 .foregroundColor(.red)
@@ -74,9 +74,21 @@ struct CreateAccountView: View {
                 }
 
                 message = "Account created successfully!"
-                navigateToHome = true
+                navigateToLoginPage()
+//                navigateToHome = true
             }
         }.resume()
+    }
+    
+    func navigateToLoginPage() {
+        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = scene.windows.first else {
+            print("Failed to get the key window")
+            return
+        }
+        
+        window.rootViewController = UIHostingController(rootView: LoginView())
+        window.makeKeyAndVisible()
     }
 }
 
