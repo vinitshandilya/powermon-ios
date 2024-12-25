@@ -10,7 +10,7 @@ struct Device: Identifiable, Decodable {
 }
 
 struct UserHome: View {
-    private var nodeServer: String = "http://192.168.1.52:3000"
+    private var nodeServer: String = "https://wattwise-k1f5.onrender.com"
     @StateObject var mqttmanager = MQTTManager()
     @State private var devices: [Device] = []
     @State private var errorMessage: String? = nil
@@ -61,6 +61,16 @@ struct UserHome: View {
                 .background(Color.blue)
                 .foregroundColor(.white)
                 .cornerRadius(8)
+                
+                // Logout link
+                Text("Logout")
+                    .font(.footnote)
+                    .foregroundColor(.blue)
+                    .padding(.top, 10)
+                    .onTapGesture {
+                        print("Logged out")
+                        logoutUser()
+                }
             }
             .navigationTitle("WattWise")
             .onAppear(perform: fetchDevices)
@@ -74,7 +84,6 @@ struct UserHome: View {
     }
     
     private func fetchDevices() {
-        mqttmanager.configureMQTT()
         guard let url = URL(string: "\(nodeServer)/get-devices?user_id=\(user_id)") else {
             errorMessage = "Invalid URL"
             return
@@ -96,23 +105,32 @@ struct UserHome: View {
             }
             
             do {
+                
+                if let rawJSON = String(data: data, encoding: .utf8) {
+                    print("Raw JSON response: \(rawJSON)")
+                }
+                
                 let decodedResponse = try JSONDecoder().decode([String: [Device]].self, from: data)
                 DispatchQueue.main.async {
+                    print(data)
                     if let fetchedDevices = decodedResponse["devices"], fetchedDevices.isEmpty {
-                        // Handle the case where the "devices" array is empty
                         errorMessage = "No devices found"
                     } else {
-                        // Assign the fetched devices
                         devices = decodedResponse["devices"] ?? []
                     }
                 }
             } catch {
                 DispatchQueue.main.async {
-                    errorMessage = "Failed to decode response"
+                    errorMessage = "Failed to decode response: \(error.localizedDescription)"
                 }
             }
 
         }.resume()
+        
+        // Ensure this does not interfere with the data fetch
+        DispatchQueue.global().async {
+            mqttmanager.configureMQTT()
+        }
     }
     
     private func addNewDevice() {
@@ -157,5 +175,21 @@ struct UserHome: View {
                 }
             }
         }.resume()
+    }
+    
+    private func logoutUser() {
+        UserDefaults.standard.set("", forKey: "user_id")
+        navigateToLoginPage()
+    }
+    
+    func navigateToLoginPage() {
+        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = scene.windows.first else {
+            print("Failed to get the key window")
+            return
+        }
+        
+        window.rootViewController = UIHostingController(rootView: LoginView())
+        window.makeKeyAndVisible()
     }
 }

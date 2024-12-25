@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct LoginView: View {
-    private var nodeServer: String = "http://192.168.1.52:3000"
+    private var nodeServer: String = "https://wattwise-k1f5.onrender.com"
     @State private var username: String = ""
     @State private var password: String = ""
     @State private var message: String = ""
-    @State private var navigateToHome: Bool = false
+    // @State private var navigateToHome: Bool = false
     @State private var user_id: String = ""
 
     var body: some View {
@@ -40,9 +40,9 @@ struct LoginView: View {
                         .foregroundColor(.blue)
                 }
 
-                NavigationLink(destination: UserHome(), isActive: $navigateToHome) {
-                    EmptyView()
-                }
+//                NavigationLink(destination: UserHome(), isActive: $navigateToHome) {
+//                    EmptyView()
+//                }
 
                 Text(message)
                     .foregroundColor(.red)
@@ -97,14 +97,23 @@ struct LoginView: View {
                     // Successful login
                     print("Login successful, uid: \(json["user_id"])")
                     UserDefaults.standard.set(json["user_id"], forKey: "user_id")
-                    
-                    self.navigateToHome = true
+                    navigateToUserHome()
                 } else {
                     // Response doesn't contain expected success message
                     self.message = "Login unsuccessful"
                 }
             }
         }.resume()
+    }
+    
+    func navigateToUserHome() {
+        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = scene.windows.first else {
+            print("Failed to get the key window")
+            return
+        }
+        window.rootViewController = UIHostingController(rootView: UserHome())
+        window.makeKeyAndVisible()
     }
 
 }

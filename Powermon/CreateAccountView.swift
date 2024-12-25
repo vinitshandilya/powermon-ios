@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CreateAccountView: View {
-    private var nodeServer: String = "http://192.168.1.52:3000"
+    private var nodeServer: String = "https://wattwise-k1f5.onrender.com"
     @State private var username: String = ""
     @State private var password: String = ""
     @State private var message: String = ""

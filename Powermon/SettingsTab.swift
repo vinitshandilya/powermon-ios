@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct SettingsTab: View {
-    var nodeServer: String = "http://192.168.1.52:3000"
+    var nodeServer: String = "https://wattwise-k1f5.onrender.com"
     let device: Device
     let mqttmanager: MQTTManager
     let newonboarding: Bool
