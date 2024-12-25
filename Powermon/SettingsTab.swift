@@ -1,9 +1,9 @@
 import SwiftUI
 
 struct SettingsTab: View {
-    // @StateObject var mqttmanager = MQTTManager()
     let device: Device
     let mqttmanager: MQTTManager
+    let newonboarding: Bool
     
     // Fields for user input
     @State private var ssid: String = UserDefaults.standard.string(forKey: "ssid") ?? ""
@@ -12,8 +12,6 @@ struct SettingsTab: View {
     @State private var port: String = UserDefaults.standard.string(forKey: "port") ?? "1883"
     @State private var username: String = UserDefaults.standard.string(forKey: "username") ?? ""
     @State private var mqttpassword: String = UserDefaults.standard.string(forKey: "mqttpassword") ?? ""
-    // @State private var subscribetopic: String = UserDefaults.standard.string(forKey: "subscribetopic") ?? "intopic"
-    // @State private var publishtopic: String = UserDefaults.standard.string(forKey: "publishtopic") ?? "outtopic"
     @State private var autoreconnect: Bool = UserDefaults.standard.bool(forKey: "autoreconnect")
     @State private var isSubmitting: Bool = false
     @State private var submitMessage: SubmitMessage? = nil
@@ -51,38 +49,41 @@ struct SettingsTab: View {
                 }
             }
             
-            Section(header: Text("Set Limits")) {
-                TextField("Nominal Usage", text: $nominalUsage)
-                    .keyboardType(.numberPad)
-                TextField("Maximum Usage", text: $maximumUsage)
-                    .keyboardType(.numberPad)
-                Button(action: {
-                    // Extract the values and send them as comma-separated
-                    if let nominal = Double(nominalUsage), let maximum = Double(maximumUsage) {
-                        UserDefaults.standard.set(nominalUsage, forKey: "nominalUsage")
-                        UserDefaults.standard.set(maximumUsage, forKey: "maximumUsage")
-                        
-                        let message = "\(nominal),\(maximum)"
-                        mqttmanager.sendMessage(topic: device.subscribe_topic, message: message)
-                        hideKeyboard()
-                    } else {
-                        print("Invalid threshold values")
+            if !newonboarding {
+                Section(header: Text("Set Limits")) {
+                    TextField("Nominal Usage", text: $nominalUsage)
+                        .keyboardType(.numberPad)
+                    TextField("Maximum Usage", text: $maximumUsage)
+                        .keyboardType(.numberPad)
+                    Button(action: {
+                        // Extract the values and send them as comma-separated
+                        if let nominal = Double(nominalUsage), let maximum = Double(maximumUsage) {
+                            UserDefaults.standard.set(nominalUsage, forKey: "nominalUsage")
+                            UserDefaults.standard.set(maximumUsage, forKey: "maximumUsage")
+                            
+                            let message = "\(nominal),\(maximum)"
+                            mqttmanager.sendMessage(topic: device.subscribe_topic, message: message)
+                            hideKeyboard()
+                        } else {
+                            print("Invalid threshold values")
+                        }
+                    }) {
+                        Text("Set Limits")
                     }
-                }) {
-                    Text("Set Limits")
                 }
-            }
-            
-            
-            Button("Reset KWh", role: .destructive) {
-                isPresentingConfirm = true
-            }
-            .confirmationDialog("Are you sure?", isPresented: $isPresentingConfirm) {
-                // publishing "1" on intopic will reset the module
-                Button("Reset usage?", role: .destructive) { mqttmanager.sendMessage(topic: device.subscribe_topic, message: "1")}
-            }
-            message: {
-                Text("Usage will be reset. You cannot undo this")
+                
+                
+                Button("Reset KWh", role: .destructive) {
+                    isPresentingConfirm = true
+                }
+                .confirmationDialog("Are you sure?", isPresented: $isPresentingConfirm) {
+                    // publishing "1" on intopic will reset the module
+                    Button("Reset usage?", role: .destructive) { mqttmanager.sendMessage(topic: device.subscribe_topic, message: "1")}
+                }
+                message: {
+                    Text("Usage will be reset. You cannot undo this")
+                }
+                
             }
         }
         .navigationTitle("Settings")
@@ -96,12 +97,11 @@ struct SettingsTab: View {
         UserDefaults.standard.set(Int(port), forKey: "port")
         UserDefaults.standard.set(username, forKey: "username")
         UserDefaults.standard.set(mqttpassword, forKey: "mqttpassword")
-        UserDefaults.standard.set(device.subscribe_topic, forKey: "subscribetopic")
-        UserDefaults.standard.set(device.publish_topic, forKey: "publishtopic")
         UserDefaults.standard.set(autoreconnect, forKey: "autoreconnect")
         
         
         // restart mqtt instance to use saved settings
+        mqttmanager.updateTopics(pub: device.publish_topic, sub: device.subscribe_topic)
         mqttmanager.configureMQTT()
     }
 

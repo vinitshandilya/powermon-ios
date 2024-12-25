@@ -9,8 +9,13 @@ class MQTTManager: CocoaMQTTDelegate, ObservableObject {
     let savedPort = UserDefaults.standard.integer(forKey: "port")
     let username = UserDefaults.standard.string(forKey: "username") ?? ""
     let mqttpassword = UserDefaults.standard.string(forKey: "mqttpassword") ?? ""
-    let subscribetopic = UserDefaults.standard.string(forKey: "subscribetopic") ?? "intopic"
-    let publishtopic = UserDefaults.standard.string(forKey: "publishtopic") ?? "outtopic"
+    var publishtopic: String = ""
+    var subscribetopic: String = ""
+    
+    func updateTopics(pub: String, sub: String) {
+        self.publishtopic = pub
+        self.subscribetopic = sub
+    }
     
     func configureMQTT() {
         let port: UInt16 = savedPort == 0 ? 1883 : UInt16(savedPort)

@@ -17,8 +17,8 @@ struct UserHome: View {
     @State private var isModalPresented: Bool = false
     @State private var newDevice: Device? = nil
     
-    @State private var subscribetopic: String = UserDefaults.standard.string(forKey: "subscribetopic") ?? "intopic"
-    @State private var publishtopic: String = UserDefaults.standard.string(forKey: "publishtopic") ?? "outtopic"
+    @State private var subscribetopic: String = "intopic"
+    @State private var publishtopic: String = "outtopic"
     
     var body: some View {
         NavigationView {
@@ -52,6 +52,7 @@ struct UserHome: View {
                                         Text(device.publish_topic)
                                             .font(.body)
                                             .foregroundColor(.primary)
+                                        
                                     }
                                     .padding()
                                     .background(Color(UIColor.systemGray6))
@@ -79,7 +80,7 @@ struct UserHome: View {
             .sheet(isPresented: $isModalPresented) {
                 // pass new device bundle to Settings page for further configuration.
                 if let newDevice = newDevice {
-                    SettingsTab(device: newDevice, mqttmanager: mqttmanager)
+                    SettingsTab(device: newDevice, mqttmanager: mqttmanager, newonboarding: true)
                 }
             }
         }

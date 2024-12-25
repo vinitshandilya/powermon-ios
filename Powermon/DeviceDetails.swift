@@ -1,10 +1,3 @@
-//
-//  DeviceDetails.swift
-//  Powermon
-//
-//  Created by vshandil on 25/12/24.
-//
-
 import SwiftUI
 
 struct DeviceDetails: View {
@@ -75,6 +68,7 @@ struct DeviceDetails: View {
         .onAppear {
             print("onAppear")
             if !mqttmanager.isMqttConnected {
+                mqttmanager.updateTopics(pub: device.publish_topic, sub: device.subscribe_topic)
                 mqttmanager.configureMQTT()
             }
         }
@@ -82,6 +76,7 @@ struct DeviceDetails: View {
             print(newPhase)
             if newPhase == .active {
                 if !mqttmanager.isMqttConnected {
+                    mqttmanager.updateTopics(pub: device.publish_topic, sub: device.subscribe_topic)
                     mqttmanager.configureMQTT()
                 }
             }
