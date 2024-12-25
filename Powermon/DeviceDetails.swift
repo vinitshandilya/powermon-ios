@@ -3,12 +3,13 @@ import SwiftUI
 struct DeviceDetails: View {
     @Environment(\.scenePhase) var scenePhase // detects application lifecycle
     @StateObject var mqttmanager = MQTTManager()
+    @State private var isSettingsPresented = false // State to control the modal sheet
     let device: Device
-    
+
     var body: some View {
         VStack {
             ConnStatusBar(status: mqttmanager.reading.level)
-            
+
             HStack {
                 if mqttmanager.isMqttConnected {
                     Label("Connected", systemImage: "checkmark.circle.fill")
@@ -25,7 +26,6 @@ struct DeviceDetails: View {
             .font(.footnote)
             .padding()
 
-            
             Form {
                 Section(header: Text("Live reading")) {
                     HStack {
@@ -59,10 +59,20 @@ struct DeviceDetails: View {
                         Text(String(mqttmanager.reading.pf)).fontWeight(.light)
                     }
                 }
-                
             }
             .font(.footnote)
-            
+
+            // Add "Settings" Text
+            Text("Settings")
+                .font(.footnote)
+                .foregroundColor(.blue)
+                .padding(.top, 10)
+                .onTapGesture {
+                    isSettingsPresented = true
+                }
+                .sheet(isPresented: $isSettingsPresented) {
+                    SettingsTab(device: device, mqttmanager: mqttmanager, newonboarding: false)
+                }
         }
         .navigationTitle("WattWise")
         .onAppear {
@@ -83,3 +93,4 @@ struct DeviceDetails: View {
         }
     }
 }
+
