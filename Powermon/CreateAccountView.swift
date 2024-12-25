@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct CreateAccountView: View {
+    private var nodeServer: String = "http://192.168.1.52:3000"
     @State private var username: String = ""
     @State private var password: String = ""
     @State private var message: String = ""
@@ -43,7 +44,7 @@ struct CreateAccountView: View {
     }
 
     func createAccount() {
-        guard let url = URL(string: "http://192.168.1.52:3000/create-account") else {
+        guard let url = URL(string: "\(nodeServer)/create-account") else {
             message = "Invalid URL"
             return
         }

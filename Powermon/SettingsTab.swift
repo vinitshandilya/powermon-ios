@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct SettingsTab: View {
+    var nodeServer: String = "http://192.168.1.52:3000"
     let device: Device
     let mqttmanager: MQTTManager
     let newonboarding: Bool
@@ -173,7 +174,7 @@ struct SettingsTab: View {
     }
     
     func deleteDevice() {
-        guard let url = URL(string: "http://192.168.1.52:3000/delete-device") else {
+        guard let url = URL(string: "\(nodeServer)/delete-device") else {
             print("Invalid URL")
             return
         }

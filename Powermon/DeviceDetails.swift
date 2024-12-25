@@ -26,41 +26,52 @@ struct DeviceDetails: View {
             .font(.footnote)
             .padding()
 
-            Form {
-                Section(header: Text("Live reading")) {
-                    HStack {
-                        Label("Power", systemImage: "bolt.circle").fontWeight(.heavy)
-                        Spacer()
-                        Text(String(mqttmanager.reading.power)).fontWeight(.light) + Text(" W").fontWeight(.light)
-                    }
-                    HStack {
-                        Label("Voltage", systemImage: "powerplug").fontWeight(.heavy)
-                        Spacer()
-                        Text(String(mqttmanager.reading.voltage)).fontWeight(.light) + Text(" V").fontWeight(.light)
-                    }
-                    HStack {
-                        Label("Current", systemImage: "alternatingcurrent").fontWeight(.heavy)
-                        Spacer()
-                        Text(String(mqttmanager.reading.current)).fontWeight(.light) + Text(" A").fontWeight(.light)
-                    }
-                    HStack {
-                        Label("Units", systemImage: "barometer").fontWeight(.heavy)
-                        Spacer()
-                        Text(String(mqttmanager.reading.energy)).fontWeight(.light) + Text(" kWh").fontWeight(.light)
-                    }
-                    HStack {
-                        Label("Freq", systemImage: "waveform").fontWeight(.heavy)
-                        Spacer()
-                        Text(String(mqttmanager.reading.frequency)).fontWeight(.light) + Text(" Hz").fontWeight(.light)
-                    }
-                    HStack {
-                        Label("PF", systemImage: "poweroff").fontWeight(.heavy)
-                        Spacer()
-                        Text(String(mqttmanager.reading.pf)).fontWeight(.light)
-                    }
-                }
+            HStack {
+                Label("Power", systemImage: "bolt.circle").fontWeight(.heavy)
+                Spacer()
+                Text(String(mqttmanager.reading.power)).fontWeight(.light) + Text(" W").fontWeight(.light)
             }
-            .font(.footnote)
+            HStack {
+                Label("Voltage", systemImage: "powerplug").fontWeight(.heavy)
+                Spacer()
+                Text(String(mqttmanager.reading.voltage)).fontWeight(.light) + Text(" V").fontWeight(.light)
+            }
+            HStack {
+                Label("Current", systemImage: "alternatingcurrent").fontWeight(.heavy)
+                Spacer()
+                Text(String(mqttmanager.reading.current)).fontWeight(.light) + Text(" A").fontWeight(.light)
+            }
+            HStack {
+                Label("Units", systemImage: "barometer").fontWeight(.heavy)
+                Spacer()
+                Text(String(mqttmanager.reading.energy)).fontWeight(.light) + Text(" kWh").fontWeight(.light)
+            }
+            HStack {
+                Label("Freq", systemImage: "waveform").fontWeight(.heavy)
+                Spacer()
+                Text(String(mqttmanager.reading.frequency)).fontWeight(.light) + Text(" Hz").fontWeight(.light)
+            }
+            HStack {
+                Label("PF", systemImage: "poweroff").fontWeight(.heavy)
+                Spacer()
+                Text(String(mqttmanager.reading.pf)).fontWeight(.light)
+            }
+            
+            
+            VStack(alignment: .leading) {
+                Text("Subscribe Topic:")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                Text(device.subscribe_topic)
+                    .font(.body)
+                    .foregroundColor(.primary)
+                Text("Publish Topic:")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                Text(device.publish_topic)
+                    .font(.body)
+                    .foregroundColor(.primary)
+            }
 
             // Add "Settings" Text
             Text("Settings")
