@@ -12,29 +12,40 @@ struct ConnStatusBar: View {
     var body: some View {
         
         switch status {
-        case "nominal":
-            return Text(status)
+        case "low":
+            return Text("Nominal usage")
                 .font(.footnote)
                 .padding()
                 .frame(maxWidth: .infinity, maxHeight: 30, alignment: .leading)
                 .foregroundColor(.white)
                 .background(Color("ConnectedColor"))
-        case "offline":
-            return Text(status)
+            
+        case "moderate":
+            return Text("Moderate usage")
                 .font(.footnote)
                 .padding()
                 .frame(maxWidth: .infinity, maxHeight: 30, alignment: .leading)
                 .foregroundColor(.white)
-                .background(Color("DisconnectedColor"))
-        case "highusage":
+                .background(Color("ModerateColor"))
+            
+        case "high":
             return Text("Higher than usual consumption")
                 .font(.footnote)
                 .padding()
                 .frame(maxWidth: .infinity, maxHeight: 30, alignment: .leading)
                 .foregroundColor(.white)
                 .background(Color("HighUsageColor"))
+            
+        case "unknown":
+            return Text("")
+                .font(.footnote)
+                .padding()
+                .frame(maxWidth: .infinity, maxHeight: 30, alignment: .leading)
+                .foregroundColor(.white)
+                .background(Color("UnknownColor"))
+            
         default:
-            return Text("unknown")
+            return Text("Unknown")
                 .font(.footnote)
                 .padding()
                 .frame(maxWidth: .infinity, maxHeight: 30, alignment: .leading)

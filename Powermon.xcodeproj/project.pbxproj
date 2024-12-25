@@ -7,9 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		C71C58BA28E336A0007A22D6 /* ChartUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = C71C58B928E336A0007A22D6 /* ChartUI.swift */; };
-		C71C58BC28E3457D007A22D6 /* DataPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = C71C58BB28E3457D007A22D6 /* DataPoint.swift */; };
-		C72DCA0F28F1C1130026C506 /* TimeStampFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72DCA0E28F1C1130026C506 /* TimeStampFormatter.swift */; };
+		C7953E462D1895E40037CDF6 /* SettingsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7953E452D1895E40037CDF6 /* SettingsTab.swift */; };
 		C79C3EA128DF2F9F00EE8EAE /* PowermonApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C3EA028DF2F9F00EE8EAE /* PowermonApp.swift */; };
 		C79C3EA328DF2F9F00EE8EAE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C3EA228DF2F9F00EE8EAE /* ContentView.swift */; };
 		C79C3EA528DF2FA100EE8EAE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C79C3EA428DF2FA100EE8EAE /* Assets.xcassets */; };
@@ -17,30 +15,28 @@
 		C79C3EB028DF2FD900EE8EAE /* CocoaMQTT in Frameworks */ = {isa = PBXBuildFile; productRef = C79C3EAF28DF2FD900EE8EAE /* CocoaMQTT */; };
 		C79C3EB228DF2FD900EE8EAE /* CocoaMQTTWebSocket in Frameworks */ = {isa = PBXBuildFile; productRef = C79C3EB128DF2FD900EE8EAE /* CocoaMQTTWebSocket */; };
 		C79C3EB428DF33D400EE8EAE /* MQTTManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C3EB328DF33D400EE8EAE /* MQTTManager.swift */; };
-		C79C3EB628DF345100EE8EAE /* UsageHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C3EB528DF345100EE8EAE /* UsageHistory.swift */; };
 		C79C3EB828DF353200EE8EAE /* Reading.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C3EB728DF353200EE8EAE /* Reading.swift */; };
-		C79C3EBA28DF35BE00EE8EAE /* DailyUsage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C3EB928DF35BE00EE8EAE /* DailyUsage.swift */; };
-		C79C3EBC28DF35F700EE8EAE /* Params.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C3EBB28DF35F700EE8EAE /* Params.swift */; };
-		C79C3EBE28DF363B00EE8EAE /* ResetButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C3EBD28DF363B00EE8EAE /* ResetButton.swift */; };
 		C79C3EC028DF753700EE8EAE /* ConnStatusBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C3EBF28DF753700EE8EAE /* ConnStatusBar.swift */; };
+		C7DD59432D1B2DF30025C547 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DD59422D1B2DF30025C547 /* LoginView.swift */; };
+		C7DD59452D1B2E320025C547 /* CreateAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DD59442D1B2E320025C547 /* CreateAccountView.swift */; };
+		C7DD59472D1B31680025C547 /* UserHome.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DD59462D1B31680025C547 /* UserHome.swift */; };
+		C7DD59492D1BBF9B0025C547 /* DeviceDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DD59482D1BBF9B0025C547 /* DeviceDetails.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		C71C58B928E336A0007A22D6 /* ChartUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartUI.swift; sourceTree = "<group>"; };
-		C71C58BB28E3457D007A22D6 /* DataPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataPoint.swift; sourceTree = "<group>"; };
-		C72DCA0E28F1C1130026C506 /* TimeStampFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeStampFormatter.swift; sourceTree = "<group>"; };
+		C7953E452D1895E40037CDF6 /* SettingsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTab.swift; sourceTree = "<group>"; };
 		C79C3E9D28DF2F9F00EE8EAE /* Powermon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Powermon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C79C3EA028DF2F9F00EE8EAE /* PowermonApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowermonApp.swift; sourceTree = "<group>"; };
 		C79C3EA228DF2F9F00EE8EAE /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		C79C3EA428DF2FA100EE8EAE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C79C3EA728DF2FA100EE8EAE /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		C79C3EB328DF33D400EE8EAE /* MQTTManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MQTTManager.swift; sourceTree = "<group>"; };
-		C79C3EB528DF345100EE8EAE /* UsageHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageHistory.swift; sourceTree = "<group>"; };
 		C79C3EB728DF353200EE8EAE /* Reading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reading.swift; sourceTree = "<group>"; };
-		C79C3EB928DF35BE00EE8EAE /* DailyUsage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyUsage.swift; sourceTree = "<group>"; };
-		C79C3EBB28DF35F700EE8EAE /* Params.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Params.swift; sourceTree = "<group>"; };
-		C79C3EBD28DF363B00EE8EAE /* ResetButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetButton.swift; sourceTree = "<group>"; };
 		C79C3EBF28DF753700EE8EAE /* ConnStatusBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnStatusBar.swift; sourceTree = "<group>"; };
+		C7DD59422D1B2DF30025C547 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		C7DD59442D1B2E320025C547 /* CreateAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountView.swift; sourceTree = "<group>"; };
+		C7DD59462D1B31680025C547 /* UserHome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserHome.swift; sourceTree = "<group>"; };
+		C7DD59482D1BBF9B0025C547 /* DeviceDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceDetails.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,20 +71,18 @@
 		C79C3E9F28DF2F9F00EE8EAE /* Powermon */ = {
 			isa = PBXGroup;
 			children = (
-				C79C3EA028DF2F9F00EE8EAE /* PowermonApp.swift */,
-				C79C3EA228DF2F9F00EE8EAE /* ContentView.swift */,
-				C72DCA0E28F1C1130026C506 /* TimeStampFormatter.swift */,
 				C79C3EA428DF2FA100EE8EAE /* Assets.xcassets */,
 				C79C3EA628DF2FA100EE8EAE /* Preview Content */,
+				C79C3EA028DF2F9F00EE8EAE /* PowermonApp.swift */,
+				C79C3EA228DF2F9F00EE8EAE /* ContentView.swift */,
+				C7DD59422D1B2DF30025C547 /* LoginView.swift */,
+				C7DD59442D1B2E320025C547 /* CreateAccountView.swift */,
+				C7DD59462D1B31680025C547 /* UserHome.swift */,
+				C7DD59482D1BBF9B0025C547 /* DeviceDetails.swift */,
 				C79C3EB328DF33D400EE8EAE /* MQTTManager.swift */,
-				C79C3EB528DF345100EE8EAE /* UsageHistory.swift */,
 				C79C3EB728DF353200EE8EAE /* Reading.swift */,
-				C79C3EB928DF35BE00EE8EAE /* DailyUsage.swift */,
-				C79C3EBB28DF35F700EE8EAE /* Params.swift */,
-				C79C3EBD28DF363B00EE8EAE /* ResetButton.swift */,
 				C79C3EBF28DF753700EE8EAE /* ConnStatusBar.swift */,
-				C71C58B928E336A0007A22D6 /* ChartUI.swift */,
-				C71C58BB28E3457D007A22D6 /* DataPoint.swift */,
+				C7953E452D1895E40037CDF6 /* SettingsTab.swift */,
 			);
 			path = Powermon;
 			sourceTree = "<group>";
@@ -178,18 +172,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C79C3EB628DF345100EE8EAE /* UsageHistory.swift in Sources */,
-				C79C3EBC28DF35F700EE8EAE /* Params.swift in Sources */,
-				C79C3EBA28DF35BE00EE8EAE /* DailyUsage.swift in Sources */,
-				C79C3EBE28DF363B00EE8EAE /* ResetButton.swift in Sources */,
-				C71C58BA28E336A0007A22D6 /* ChartUI.swift in Sources */,
-				C71C58BC28E3457D007A22D6 /* DataPoint.swift in Sources */,
 				C79C3EA328DF2F9F00EE8EAE /* ContentView.swift in Sources */,
+				C7953E462D1895E40037CDF6 /* SettingsTab.swift in Sources */,
 				C79C3EB428DF33D400EE8EAE /* MQTTManager.swift in Sources */,
+				C7DD59452D1B2E320025C547 /* CreateAccountView.swift in Sources */,
 				C79C3EC028DF753700EE8EAE /* ConnStatusBar.swift in Sources */,
 				C79C3EB828DF353200EE8EAE /* Reading.swift in Sources */,
+				C7DD59472D1B31680025C547 /* UserHome.swift in Sources */,
+				C7DD59492D1BBF9B0025C547 /* DeviceDetails.swift in Sources */,
+				C7DD59432D1B2DF30025C547 /* LoginView.swift in Sources */,
 				C79C3EA128DF2F9F00EE8EAE /* PowermonApp.swift in Sources */,
-				C72DCA0F28F1C1130026C506 /* TimeStampFormatter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
