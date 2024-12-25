@@ -98,13 +98,20 @@ struct UserHome: View {
             do {
                 let decodedResponse = try JSONDecoder().decode([String: [Device]].self, from: data)
                 DispatchQueue.main.async {
-                    devices = decodedResponse["devices"] ?? []
+                    if let fetchedDevices = decodedResponse["devices"], fetchedDevices.isEmpty {
+                        // Handle the case where the "devices" array is empty
+                        errorMessage = "No devices found"
+                    } else {
+                        // Assign the fetched devices
+                        devices = decodedResponse["devices"] ?? []
+                    }
                 }
             } catch {
                 DispatchQueue.main.async {
                     errorMessage = "Failed to decode response"
                 }
             }
+
         }.resume()
     }
     
