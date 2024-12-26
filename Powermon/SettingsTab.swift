@@ -21,7 +21,6 @@ struct SettingsTab: View {
     @State private var isPresentingConfirm: Bool = false
     @State private var nominalUsage: String = UserDefaults.standard.string(forKey: "nominalUsage") ?? "500"
     @State private var maximumUsage: String = UserDefaults.standard.string(forKey: "maximumUsage") ?? "1000"
-    @State private var isDeletingDevice: Bool = false
 
     var body: some View {
         Form {
@@ -85,15 +84,7 @@ struct SettingsTab: View {
                 message: {
                     Text("Usage will be reset. You cannot undo this")
                 }
-                
-                Button("Delete device", role: .destructive) {
-                    isDeletingDevice = true
-                    deleteDevice()
-                }
-                .disabled(isDeletingDevice)
-                .alert(isPresented: $isDeletingDevice) {
-                    Alert(title: Text("Deleting Device"), message: Text("Device is being deleted."), dismissButton: .default(Text("OK")))
-                }
+
             }
         }
         .navigationTitle("Settings")
@@ -171,58 +162,6 @@ struct SettingsTab: View {
                 }
             }
         }.resume()
-    }
-    
-    func deleteDevice() {
-        guard let url = URL(string: "\(nodeServer)/delete-device") else {
-            print("Invalid URL")
-            return
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "DELETE"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-        let parameters: [String: String] = [
-            "user_id": user_id,
-            "device_id": device.device_id
-        ]
-
-        do {
-            request.httpBody = try JSONSerialization.data(withJSONObject: parameters, options: [])
-        } catch {
-            print("Failed to serialize JSON: \(error)")
-            return
-        }
-
-        let session = URLSession.shared
-        session.dataTask(with: request) { data, response, error in
-            DispatchQueue.main.async {
-                isDeletingDevice = false
-                if let error = error {
-                    print("Error deleting device: \(error.localizedDescription)")
-                    return
-                }
-
-                if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
-                    print("Device deleted successfully")
-                    navigateToUserHome()
-                } else {
-                    print("Failed to delete device")
-                }
-            }
-        }.resume()
-    }
-
-    func navigateToUserHome() {
-        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let window = scene.windows.first else {
-            print("Failed to get the key window")
-            return
-        }
-        
-        window.rootViewController = UIHostingController(rootView: UserHome())
-        window.makeKeyAndVisible()
     }
 
     func hideKeyboard() {
