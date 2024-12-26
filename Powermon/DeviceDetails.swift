@@ -85,7 +85,7 @@ struct DeviceDetails: View {
                     SettingsTab(device: device, mqttmanager: mqttmanager, newonboarding: false)
                 }
         }
-        .navigationTitle("WattWise")
+        .navigationTitle(device.device_name)
         .onAppear {
             print("onAppear")
             if !mqttmanager.isMqttConnected {

@@ -13,6 +13,7 @@ struct LoginView: View {
     @State private var password: String = ""
     @State private var message: String = ""
     @State private var user_id: String = ""
+    @State private var waitingForServerResponse: Bool = false
 
     var body: some View {
         VStack(spacing: 20) {
@@ -32,11 +33,6 @@ struct LoginView: View {
                 loginUser()
             }
             .buttonStyle(.borderedProminent)
-
-//            NavigationLink(destination: CreateAccountView()) {
-//                Text("Create a new account")
-//                    .foregroundColor(.blue)
-//            }
             
             Text("Create a new account")
                 .font(.footnote)
@@ -46,6 +42,14 @@ struct LoginView: View {
                     print("Navigating to create new account page")
                     navigateToCreateAccountPage()
             }
+            
+            if(waitingForServerResponse) {
+                HStack {
+                    ProgressView().scaleEffect(0.8)
+                    Text("Logging you in. Please wait...")
+                }
+                .foregroundColor(.gray)
+            }
 
             Text(message)
                 .foregroundColor(.red)
@@ -54,6 +58,7 @@ struct LoginView: View {
     }
 
     func loginUser() {
+        waitingForServerResponse = true
         guard let url = URL(string: "\(nodeServer)/login") else {
             message = "Invalid URL"
             return
@@ -65,6 +70,7 @@ struct LoginView: View {
         // Serialize the body into JSON data
         guard let jsonData = try? JSONSerialization.data(withJSONObject: body) else {
             message = "Invalid request body"
+            waitingForServerResponse = false
             return
         }
 
@@ -84,12 +90,14 @@ struct LoginView: View {
                 if let error = error {
                     // Network error
                     self.message = "Error: \(error.localizedDescription)"
+                    waitingForServerResponse = false
                     return
                 }
 
                 guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200, let data = data else {
                     // Invalid response or unsuccessful login
                     self.message = "Login unsuccessful"
+                    waitingForServerResponse = false
                     return
                 }
 
@@ -99,10 +107,12 @@ struct LoginView: View {
                     // Successful login
                     print("Login successful, uid: \(json["user_id"])")
                     UserDefaults.standard.set(json["user_id"], forKey: "user_id")
+                    waitingForServerResponse = false
                     navigateToUserHome()
                 } else {
                     // Response doesn't contain expected success message
                     self.message = "Login unsuccessful"
+                    waitingForServerResponse = false
                 }
             }
         }.resume()

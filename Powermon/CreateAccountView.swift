@@ -12,7 +12,7 @@ struct CreateAccountView: View {
     @State private var username: String = ""
     @State private var password: String = ""
     @State private var message: String = ""
-    // @State private var navigateToHome: Bool = false
+    @State private var waitingForServerResponse: Bool = false
 
     var body: some View {
         VStack(spacing: 20) {
@@ -32,10 +32,16 @@ struct CreateAccountView: View {
                 createAccount()
             }
             .buttonStyle(.borderedProminent)
+            
+            if(waitingForServerResponse) {
+                HStack {
+                    ProgressView().scaleEffect(0.8)
+                    Text("Creating your account. Please wait...")
+                }
+                .foregroundColor(.gray)
+            }
 
-//            NavigationLink(destination: UserHome(), isActive: $navigateToHome) {
-//                EmptyView()
-//            }
+
 
             Text(message)
                 .foregroundColor(.red)
@@ -44,8 +50,10 @@ struct CreateAccountView: View {
     }
 
     func createAccount() {
+        waitingForServerResponse = true
         guard let url = URL(string: "\(nodeServer)/create-account") else {
             message = "Invalid URL"
+            waitingForServerResponse = false
             return
         }
 
@@ -53,6 +61,7 @@ struct CreateAccountView: View {
 
         guard let jsonData = try? JSONSerialization.data(withJSONObject: body) else {
             message = "Invalid request body"
+            waitingForServerResponse = false
             return
         }
 
@@ -65,17 +74,19 @@ struct CreateAccountView: View {
             DispatchQueue.main.async {
                 if let error = error {
                     message = "Error: \(error.localizedDescription)"
+                    waitingForServerResponse = false
                     return
                 }
 
                 guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
                     message = "Failed to create account"
+                    waitingForServerResponse = false
                     return
                 }
 
                 message = "Account created successfully!"
+                waitingForServerResponse = false
                 navigateToLoginPage()
-//                navigateToHome = true
             }
         }.resume()
     }

@@ -12,6 +12,9 @@ struct UserHome: View {
     @State private var publishtopic: String = "outtopic"
     @State private var waitingForServerResponse: Bool = false
     
+    @State private var editingDeviceID: String? = nil
+    @State private var newDeviceName: String = ""
+    
     var body: some View {
         NavigationView {
             VStack {
@@ -26,20 +29,51 @@ struct UserHome: View {
                             ForEach(devices) { device in
                                 NavigationLink(destination: DeviceDetails(device: device)) {
                                     VStack(alignment: .leading) {
-                                        Text("Device ID:")
+                                        Text("Device Name:")
                                             .font(.subheadline)
                                             .foregroundColor(.secondary)
-                                        Text(device.device_id)
+                                        
+                                        if editingDeviceID == device.device_id {
+                                            TextField("Enter new name", text: $newDeviceName, onCommit: {
+                                                updateDeviceName(deviceID: device.device_id, deviceName: newDeviceName)
+                                                editingDeviceID = nil
+                                            })
                                             .font(.body)
                                             .foregroundColor(.primary)
-                                        
-                                        Text(Image(systemName: "xmark.circle"))
-                                            .font(.system(size: 20))
-                                            .foregroundColor(.red)
+                                            .textFieldStyle(RoundedBorderTextFieldStyle())
                                             .onTapGesture {
-                                                deleteDeviceFromServer(device: device)
+                                                if newDeviceName.isEmpty {
+                                                    newDeviceName = device.device_name // Prepopulate the text field
+                                                }
                                             }
+                                        } else {
+                                            Text(device.device_name)
+                                                .font(.body)
+                                                .foregroundColor(.primary)
+                                        }
                                         
+                                        // Hamburger menu for each device
+                                        HStack {
+                                            Spacer()
+                                            Menu {
+                                                Button(action: {
+                                                    editingDeviceID = device.device_id
+                                                    newDeviceName = device.device_name
+                                                }) {
+                                                    Label("Rename", systemImage: "pencil")
+                                                }
+                                                Button(action: {
+                                                    deleteDeviceFromServer(device: device)
+                                                }) {
+                                                    Label("Delete", systemImage: "trash")
+                                                        .foregroundColor(.red)
+                                                }
+                                            } label: {
+                                                Image(systemName: "ellipsis.circle")
+                                                    .font(.system(size: 20))
+                                                    .foregroundColor(.primary)
+                                            }
+                                        }
                                     }
                                     .padding()
                                     .background(Color(UIColor.systemGray6))
@@ -87,7 +121,7 @@ struct UserHome: View {
                     .onTapGesture {
                         print("Logged out")
                         logoutUser()
-                }
+                    }
             }
             .navigationTitle("WattWise")
             .onAppear(perform: loadDevicesLocally) // Load saved devices
@@ -110,7 +144,11 @@ struct UserHome: View {
         do {
             // Decode the data into a [Device] array
             devices = try JSONDecoder().decode([Device].self, from: savedData)
-            print("Devices retrieved successfully from UserDefaults.")
+            if devices.isEmpty {
+                errorMessage = "No devices found locally. Getting devices from server..."
+                loadDevicesFromServer()
+            }
+//            print("Devices retrieved successfully from UserDefaults.")
         } catch {
             print("Failed to decode devices from UserDefaults: \(error.localizedDescription)")
             devices = []
@@ -167,7 +205,8 @@ struct UserHome: View {
     }
     
     private func logoutUser() {
-        UserDefaults.standard.set("", forKey: "user_id")
+        saveDeviceArrayLocally(devices: []) // clear devices from local storage
+        UserDefaults.standard.set("", forKey: "user_id") // clear saved user id
         navigateToLoginPage()
     }
     
@@ -241,7 +280,7 @@ struct UserHome: View {
                     waitingForServerResponse = false
                 }
             }
-
+            
         }.resume()
         
         // Ensure this does not interfere with the data fetch
@@ -250,20 +289,21 @@ struct UserHome: View {
         }
     }
     
-    func deleteDeviceFromServer(device: Device) {
+    func updateDeviceName(deviceID: String, deviceName: String) {
         waitingForServerResponse = true
-        guard let url = URL(string: "\(nodeServer)/delete-device") else {
+        guard let url = URL(string: "https://wattwise-k1f5.onrender.com/update-device-name") else {
             print("Invalid URL")
             return
         }
 
         var request = URLRequest(url: url)
-        request.httpMethod = "DELETE"
+        request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
         let parameters: [String: String] = [
             "user_id": user_id,
-            "device_id": device.device_id
+            "device_id": deviceID,
+            "device_name": deviceName
         ]
 
         do {
@@ -278,14 +318,14 @@ struct UserHome: View {
         session.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
                 if let error = error {
-                    print("Error deleting device: \(error.localizedDescription)")
+                    print("Error updating device name: \(error.localizedDescription)")
                     waitingForServerResponse = false
                     return
                 }
 
                 guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                    print("Failed to delete device: Invalid response")
                     waitingForServerResponse = false
+                    print("Failed to update device name: Invalid response")
                     return
                 }
 
@@ -296,6 +336,71 @@ struct UserHome: View {
                 }
 
                 do {
+                    if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+                       let message = json["message"] as? String {
+                        waitingForServerResponse = false
+                        print("Server Response: \(message)")
+                        print("Refreshing device list..")
+                        loadDevicesFromServer()
+                    } else {
+                        waitingForServerResponse = false
+                        print("Failed to parse server response")
+                    }
+                } catch {
+                    waitingForServerResponse = false
+                    print("Error decoding response: \(error)")
+                }
+            }
+        }.resume()
+    }
+
+    
+    func deleteDeviceFromServer(device: Device) {
+        waitingForServerResponse = true
+        guard let url = URL(string: "\(nodeServer)/delete-device") else {
+            print("Invalid URL")
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let parameters: [String: String] = [
+            "user_id": user_id,
+            "device_id": device.device_id
+        ]
+        
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: parameters, options: [])
+        } catch {
+            print("Failed to serialize JSON: \(error)")
+            waitingForServerResponse = false
+            return
+        }
+        
+        let session = URLSession.shared
+        session.dataTask(with: request) { data, response, error in
+            DispatchQueue.main.async {
+                if let error = error {
+                    print("Error deleting device: \(error.localizedDescription)")
+                    waitingForServerResponse = false
+                    return
+                }
+                
+                guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                    print("Failed to delete device: Invalid response")
+                    waitingForServerResponse = false
+                    return
+                }
+                
+                guard let data = data else {
+                    waitingForServerResponse = false
+                    print("No data received from server")
+                    return
+                }
+                
+                do {
                     // Parse the response JSON
                     if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
                        let devicesData = json["devices"] {
@@ -303,7 +408,7 @@ struct UserHome: View {
                         let devicesJSON = try JSONSerialization.data(withJSONObject: devicesData, options: [])
                         // Decode the devices array into [Device]
                         devices = try JSONDecoder().decode([Device].self, from: devicesJSON)
-
+                        
                         // Save devices locally
                         saveDeviceArrayLocally(devices: devices)
                         waitingForServerResponse = false
@@ -319,23 +424,23 @@ struct UserHome: View {
             }
         }.resume()
     }
-//    private func saveSingleDeviceLocally(newDevice: Device) {
-//        // Retrieve existing devices from UserDefaults
-//        loadDevicesLocally()
-//        
-//        // Add the new device to the array
-//        devices.append(newDevice)
-//        
-//        // Save the updated array back to UserDefaults
-//        do {
-//            let encodedData = try JSONEncoder().encode(devices)
-//            UserDefaults.standard.set(encodedData, forKey: "savedDevices")
-//            print("Device added and saved successfully to UserDefaults.")
-//        } catch {
-//            print("Failed to encode and save the device: \(error.localizedDescription)")
-//        }
-//    }
-
-
-
+    //    private func saveSingleDeviceLocally(newDevice: Device) {
+    //        // Retrieve existing devices from UserDefaults
+    //        loadDevicesLocally()
+    //
+    //        // Add the new device to the array
+    //        devices.append(newDevice)
+    //
+    //        // Save the updated array back to UserDefaults
+    //        do {
+    //            let encodedData = try JSONEncoder().encode(devices)
+    //            UserDefaults.standard.set(encodedData, forKey: "savedDevices")
+    //            print("Device added and saved successfully to UserDefaults.")
+    //        } catch {
+    //            print("Failed to encode and save the device: \(error.localizedDescription)")
+    //        }
+    //    }
+    
+    
+    
 }
