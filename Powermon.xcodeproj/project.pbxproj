@@ -21,6 +21,7 @@
 		C7DD59452D1B2E320025C547 /* CreateAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DD59442D1B2E320025C547 /* CreateAccountView.swift */; };
 		C7DD59472D1B31680025C547 /* UserHome.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DD59462D1B31680025C547 /* UserHome.swift */; };
 		C7DD59492D1BBF9B0025C547 /* DeviceDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DD59482D1BBF9B0025C547 /* DeviceDetails.swift */; };
+		C7E474A22D1D4355009BBA26 /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E474A12D1D4355009BBA26 /* Device.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,6 +38,7 @@
 		C7DD59442D1B2E320025C547 /* CreateAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountView.swift; sourceTree = "<group>"; };
 		C7DD59462D1B31680025C547 /* UserHome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserHome.swift; sourceTree = "<group>"; };
 		C7DD59482D1BBF9B0025C547 /* DeviceDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceDetails.swift; sourceTree = "<group>"; };
+		C7E474A12D1D4355009BBA26 /* Device.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -83,6 +85,7 @@
 				C79C3EB728DF353200EE8EAE /* Reading.swift */,
 				C79C3EBF28DF753700EE8EAE /* ConnStatusBar.swift */,
 				C7953E452D1895E40037CDF6 /* SettingsTab.swift */,
+				C7E474A12D1D4355009BBA26 /* Device.swift */,
 			);
 			path = Powermon;
 			sourceTree = "<group>";
@@ -172,6 +175,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C7E474A22D1D4355009BBA26 /* Device.swift in Sources */,
 				C79C3EA328DF2F9F00EE8EAE /* ContentView.swift in Sources */,
 				C7953E462D1895E40037CDF6 /* SettingsTab.swift in Sources */,
 				C79C3EB428DF33D400EE8EAE /* MQTTManager.swift in Sources */,

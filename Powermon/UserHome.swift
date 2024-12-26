@@ -1,14 +1,5 @@
 import SwiftUI
 
-struct Device: Identifiable, Decodable, Encodable {
-    let id = UUID()
-    let device_id: String
-    let subscribe_topic: String
-    let publish_topic: String
-    let lower_limit: Int
-    let upper_limit: Int
-}
-
 struct UserHome: View {
     private var nodeServer: String = "https://wattwise-k1f5.onrender.com"
     @StateObject var mqttmanager = MQTTManager()
@@ -19,6 +10,7 @@ struct UserHome: View {
     @State private var newDevice: Device? = nil
     @State private var subscribetopic: String = "intopic"
     @State private var publishtopic: String = "outtopic"
+    @State private var waitingForServerResponse: Bool = false
     
     var body: some View {
         NavigationView {
@@ -41,12 +33,10 @@ struct UserHome: View {
                                             .font(.body)
                                             .foregroundColor(.primary)
                                         
-                                        Text(Image(systemName: "xmark.circle")) // Embedding SF Symbol in Text
-                                            .font(.system(size: 20)) // Adjust the size of the SF Symbol
-                                            .foregroundColor(.red) // Customize color
+                                        Text(Image(systemName: "xmark.circle"))
+                                            .font(.system(size: 20))
+                                            .foregroundColor(.red)
                                             .onTapGesture {
-                                                // Handle the tap action here
-                                                print("SF Symbol in Text tapped!")
                                                 deleteDeviceFromServer(device: device)
                                             }
                                         
@@ -59,6 +49,14 @@ struct UserHome: View {
                         }
                         .padding()
                     }
+                }
+                
+                if(waitingForServerResponse) {
+                    HStack {
+                        ProgressView().scaleEffect(0.8)
+                        Text("Please wait...")
+                    }
+                    .foregroundColor(.gray)
                 }
                 
                 Text("Refresh")
@@ -120,7 +118,7 @@ struct UserHome: View {
     }
     
     private func addNewDevice() {
-        // get deviceid from server
+        waitingForServerResponse = true
         guard let url = URL(string: "\(nodeServer)/add-device") else {
             errorMessage = "Invalid URL"
             return
@@ -137,6 +135,7 @@ struct UserHome: View {
             if let error = error {
                 DispatchQueue.main.async {
                     errorMessage = "Error: \(error.localizedDescription)"
+                    waitingForServerResponse = false
                 }
                 return
             }
@@ -144,6 +143,7 @@ struct UserHome: View {
             guard let data = data else {
                 DispatchQueue.main.async {
                     errorMessage = "No data received"
+                    waitingForServerResponse = false
                 }
                 return
             }
@@ -151,6 +151,7 @@ struct UserHome: View {
             do {
                 let newDevice = try JSONDecoder().decode(Device.self, from: data)
                 DispatchQueue.main.async {
+                    waitingForServerResponse = false
                     self.newDevice = newDevice
                     self.devices.append(newDevice)
                     saveDeviceArrayLocally(devices: self.devices)
@@ -158,6 +159,7 @@ struct UserHome: View {
                 }
             } catch {
                 DispatchQueue.main.async {
+                    waitingForServerResponse = false
                     errorMessage = "Failed to decode response"
                 }
             }
@@ -193,6 +195,7 @@ struct UserHome: View {
     }
     
     private func loadDevicesFromServer() {
+        waitingForServerResponse = true
         guard let url = URL(string: "\(nodeServer)/get-devices?user_id=\(user_id)") else {
             errorMessage = "Invalid URL"
             return
@@ -202,6 +205,7 @@ struct UserHome: View {
             if let error = error {
                 DispatchQueue.main.async {
                     errorMessage = "Error: \(error.localizedDescription)"
+                    waitingForServerResponse = false
                 }
                 return
             }
@@ -209,6 +213,7 @@ struct UserHome: View {
             guard let data = data else {
                 DispatchQueue.main.async {
                     errorMessage = "No data received"
+                    waitingForServerResponse = false
                 }
                 return
             }
@@ -222,6 +227,7 @@ struct UserHome: View {
                 let decodedResponse = try JSONDecoder().decode([String: [Device]].self, from: data)
                 DispatchQueue.main.async {
                     print(data)
+                    waitingForServerResponse = false
                     if let fetchedDevices = decodedResponse["devices"], fetchedDevices.isEmpty {
                         errorMessage = "No devices found"
                     } else {
@@ -232,6 +238,7 @@ struct UserHome: View {
             } catch {
                 DispatchQueue.main.async {
                     errorMessage = "Failed to decode response: \(error.localizedDescription)"
+                    waitingForServerResponse = false
                 }
             }
 
@@ -244,6 +251,7 @@ struct UserHome: View {
     }
     
     func deleteDeviceFromServer(device: Device) {
+        waitingForServerResponse = true
         guard let url = URL(string: "\(nodeServer)/delete-device") else {
             print("Invalid URL")
             return
@@ -262,6 +270,7 @@ struct UserHome: View {
             request.httpBody = try JSONSerialization.data(withJSONObject: parameters, options: [])
         } catch {
             print("Failed to serialize JSON: \(error)")
+            waitingForServerResponse = false
             return
         }
 
@@ -270,15 +279,18 @@ struct UserHome: View {
             DispatchQueue.main.async {
                 if let error = error {
                     print("Error deleting device: \(error.localizedDescription)")
+                    waitingForServerResponse = false
                     return
                 }
 
                 guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
                     print("Failed to delete device: Invalid response")
+                    waitingForServerResponse = false
                     return
                 }
 
                 guard let data = data else {
+                    waitingForServerResponse = false
                     print("No data received from server")
                     return
                 }
@@ -294,12 +306,14 @@ struct UserHome: View {
 
                         // Save devices locally
                         saveDeviceArrayLocally(devices: devices)
-
+                        waitingForServerResponse = false
                         print("Devices after deletion: \(devices)")
                     } else {
+                        waitingForServerResponse = false
                         print("Failed to parse response JSON")
                     }
                 } catch {
+                    waitingForServerResponse = false
                     print("Error decoding response: \(error)")
                 }
             }
