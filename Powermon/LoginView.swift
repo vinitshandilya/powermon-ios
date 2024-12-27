@@ -105,8 +105,9 @@ struct LoginView: View {
                 if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                    let userMessage = json["message"] as? String, userMessage == "Login successful" {
                     // Successful login
-                    print("Login successful, uid: \(json["user_id"])")
+                    // print("Login successful, uid: \(json["user_id"])")
                     UserDefaults.standard.set(json["user_id"], forKey: "user_id")
+                    UserDefaults.standard.set(username, forKey: "username")
                     waitingForServerResponse = false
                     navigateToUserHome()
                 } else {
@@ -138,8 +139,4 @@ struct LoginView: View {
         window.makeKeyAndVisible()
     }
 
-}
-
-#Preview {
-    LoginView()
 }

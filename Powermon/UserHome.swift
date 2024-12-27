@@ -6,41 +6,99 @@ struct UserHome: View {
     @State private var devices: [Device] = []
     @State private var errorMessage: String? = nil
     @State private var user_id: String = UserDefaults.standard.string(forKey: "user_id") ?? ""
-    @State private var isModalPresented: Bool = false
+    @State private var username: String = UserDefaults.standard.string(forKey: "username") ?? ""
+    @State private var isDeviceSettingModalShowing: Bool = false
     @State private var newDevice: Device? = nil
     @State private var subscribetopic: String = "intopic"
     @State private var publishtopic: String = "outtopic"
     @State private var waitingForServerResponse: Bool = false
-    
     @State private var editingDeviceID: String? = nil
     @State private var newDeviceName: String = ""
+    @State private var isAppMenuvisible = false
+    @FocusState private var isTextFieldFocused: Bool
+    
+    private var colors: [Color] = [Color("Tile1"), Color("Tile2"), Color("Tile3"), Color("Tile4"), Color("Tile5")]
     
     var body: some View {
         NavigationView {
             VStack {
                 if devices.isEmpty {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 150))]) {
+                        // Add new device button
+                        VStack {
+                            Spacer()
+                            Text("+ Add New")
+                                .font(.body)
+                                .foregroundColor(.gray)
+                            Spacer()
+                        }
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(style: StrokeStyle(lineWidth: 1, dash: [5, 5])) // Dashed line
+                                .foregroundColor(Color("TileHeading"))
+                        )
+                        .onTapGesture {
+                            addNewDevice()
+                        }
+                    }
+                    .padding()
+                    
+                    Spacer()
+                    
                     Text(errorMessage ?? "No devices found")
-                        .font(.headline)
                         .foregroundColor(.gray)
                         .padding()
                 } else {
                     ScrollView {
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 150))]) {
-                            ForEach(devices) { device in
+                        LazyVGrid(
+                            columns: [GridItem(.adaptive(minimum: 150), spacing: 20)], // Column spacing
+                            spacing: 20 // Row spacing
+                        ) {
+                            ForEach(devices.indices, id: \.self) { index in
+                                let device = devices[index]
                                 NavigationLink(destination: DeviceDetails(device: device)) {
                                     VStack(alignment: .leading) {
-                                        Text("Device Name:")
-                                            .font(.subheadline)
-                                            .foregroundColor(.secondary)
+                                        HStack { // Tile heading
+                                            Label("Device", systemImage: "powermeter")
+                                                .font(.subheadline)
+                                                .foregroundColor(Color("TileHeading"))
+                                            Spacer()
+                                            Menu {
+                                                Button(action: {
+                                                    editingDeviceID = device.device_id
+                                                    newDeviceName = device.device_name
+                                                    isTextFieldFocused = true
+                                                }) {
+                                                    Label("Rename", systemImage: "pencil")
+                                                }
+                                                Button(role: .destructive, action: {
+                                                    deleteDeviceFromServer(device: device)
+                                                }) {
+                                                    Label("Delete", systemImage: "trash")
+                                                        .foregroundColor(.red)
+                                                }
+                                            } label: {
+                                                Image(systemName: "ellipsis.circle")
+                                                    .foregroundColor(Color("TileHeading"))
+                                            }
+                                        }
                                         
+                                        // Tile text
                                         if editingDeviceID == device.device_id {
                                             TextField("Enter new name", text: $newDeviceName, onCommit: {
-                                                updateDeviceName(deviceID: device.device_id, deviceName: newDeviceName)
+                                                if newDeviceName != device.device_name {
+                                                    updateDeviceName(deviceID: device.device_id, deviceName: newDeviceName)
+                                                }
                                                 editingDeviceID = nil
+                                                isTextFieldFocused = false
                                             })
+                                            .focused($isTextFieldFocused)
                                             .font(.body)
+                                            .background(Color.clear)
                                             .foregroundColor(.primary)
-                                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                                            // .textFieldStyle(RoundedBorderTextFieldStyle())
                                             .onTapGesture {
                                                 if newDeviceName.isEmpty {
                                                     newDeviceName = device.device_name // Prepopulate the text field
@@ -50,39 +108,44 @@ struct UserHome: View {
                                             Text(device.device_name)
                                                 .font(.body)
                                                 .foregroundColor(.primary)
-                                        }
-                                        
-                                        // Hamburger menu for each device
-                                        HStack {
-                                            Spacer()
-                                            Menu {
-                                                Button(action: {
-                                                    editingDeviceID = device.device_id
-                                                    newDeviceName = device.device_name
-                                                }) {
-                                                    Label("Rename", systemImage: "pencil")
-                                                }
-                                                Button(action: {
-                                                    deleteDeviceFromServer(device: device)
-                                                }) {
-                                                    Label("Delete", systemImage: "trash")
-                                                        .foregroundColor(.red)
-                                                }
-                                            } label: {
-                                                Image(systemName: "ellipsis.circle")
-                                                    .font(.system(size: 20))
-                                                    .foregroundColor(.primary)
-                                            }
+                                                .lineLimit(1) // Limit the text to a single line
+                                                .truncationMode(.tail) // Truncate with ellipsis at the end
                                         }
                                     }
                                     .padding()
-                                    .background(Color(UIColor.systemGray6))
-                                    .cornerRadius(8)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .fill(colors[index % colors.count]) // Apply the background color here
+                                    )
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .stroke(Color("TileHeading"), lineWidth: 0.5)
+                                    )
                                 }
                             }
+
+                            // Add new device button
+                            VStack {
+                                Spacer()
+                                Text("+ Add New")
+                                    .font(.body)
+                                    .foregroundColor(.gray)
+                                Spacer()
+                            }
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(style: StrokeStyle(lineWidth: 1, dash: [5, 5])) // Dashed line
+                                    .foregroundColor(.gray)
+                            )
+                            .onTapGesture {
+                                addNewDevice()
+                            }
                         }
-                        .padding()
+                        .padding() // Adds padding around the entire grid
                     }
+
                 }
                 
                 if(waitingForServerResponse) {
@@ -92,40 +155,51 @@ struct UserHome: View {
                     }
                     .foregroundColor(.gray)
                 }
-                
-                Text("Refresh")
+
+                Text("WattWise, Copyright © 2025")
                     .font(.footnote)
-                    .foregroundColor(.blue)
+                    .foregroundColor(.gray)
                     .padding(.top, 10)
-                    .onTapGesture {
-                        print("Loading devices from server")
-                        loadDevicesFromServer()
-                    }
-                
-                Button(action: addNewDevice) {
-                    HStack {
-                        Image(systemName: "plus")
-                        Text("Add New Device")
+            }
+            .padding(.top)
+            .navigationTitle("Hi, \(username)")
+            .navigationBarTitleDisplayMode(.inline) // Keeps the title inline
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        isAppMenuvisible.toggle()
+                    }) {
+                        Image(systemName: "person.crop.circle").foregroundColor(Color("NavbarItemsColor"))
                     }
                 }
-                .padding()
-                .background(Color.blue)
-                .foregroundColor(.white)
-                .cornerRadius(8)
                 
-                // Logout link
-                Text("Logout")
-                    .font(.footnote)
-                    .foregroundColor(.blue)
-                    .padding(.top, 10)
-                    .onTapGesture {
-                        print("Logged out")
-                        logoutUser()
+                // Right-side button (Settings icon)
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        loadDevicesFromServer()
+                    }) {
+                        Image(systemName: "arrow.clockwise.circle").foregroundColor(Color("NavbarItemsColor"))
                     }
+                }
             }
-            .navigationTitle("WattWise")
+            .sheet(isPresented: $isAppMenuvisible) {
+                VStack {
+                    List {
+                        Button(role: .destructive, action: {
+                            logoutUser()
+                            isAppMenuvisible.toggle()
+                        }) {
+                            Label("Logout", systemImage: "arrow.right.circle").foregroundColor(.red)
+                        }
+                    }
+                    .padding(.top)
+                    .listStyle(PlainListStyle())
+                    .frame(maxWidth: .infinity)
+                }
+                .presentationDetents([.fraction(0.2)])
+            }
             .onAppear(perform: loadDevicesLocally) // Load saved devices
-            .sheet(isPresented: $isModalPresented) {
+            .sheet(isPresented: $isDeviceSettingModalShowing) {
                 // pass new device bundle to Settings page for further configuration.
                 if let newDevice = newDevice {
                     SettingsTab(device: newDevice, mqttmanager: mqttmanager, newonboarding: true)
@@ -193,7 +267,7 @@ struct UserHome: View {
                     self.newDevice = newDevice
                     self.devices.append(newDevice)
                     saveDeviceArrayLocally(devices: self.devices)
-                    self.isModalPresented = true
+                    self.isDeviceSettingModalShowing = true
                 }
             } catch {
                 DispatchQueue.main.async {
@@ -207,6 +281,7 @@ struct UserHome: View {
     private func logoutUser() {
         saveDeviceArrayLocally(devices: []) // clear devices from local storage
         UserDefaults.standard.set("", forKey: "user_id") // clear saved user id
+        UserDefaults.standard.set("", forKey: "username") // clear saved username
         navigateToLoginPage()
     }
     
