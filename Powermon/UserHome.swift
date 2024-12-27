@@ -145,6 +145,9 @@ struct UserHome: View {
                         }
                         .padding() // Adds padding around the entire grid
                     }
+                    .refreshable {
+                        loadDevicesFromServer()
+                    }
 
                 }
                 
