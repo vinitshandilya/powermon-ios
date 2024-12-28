@@ -23,33 +23,43 @@ struct UserHome: View {
         NavigationView {
             VStack {
                 if devices.isEmpty {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 150))]) {
-                        // Add new device button
-                        VStack {
-                            Spacer()
-                            Text("+ Add New")
-                                .font(.body)
-                                .foregroundColor(.gray)
-                            Spacer()
+                    ScrollView {
+                        LazyVGrid(
+                            columns: [GridItem(.adaptive(minimum: 150), spacing: 20)], // Column spacing
+                            spacing: 20 // Row spacing
+                        ) {
+                            // Add new device button
+                            VStack {
+                                Spacer()
+                                Text("+ Add New")
+                                    .font(.body)
+                                    .foregroundColor(.gray)
+                                Spacer()
+                            }
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(style: StrokeStyle(lineWidth: 1, dash: [5, 5])) // Dashed line
+                                    .foregroundColor(Color("TileHeading"))
+                            )
+                            .onTapGesture {
+                                addNewDevice()
+                            }
                         }
                         .padding()
-                        .frame(maxWidth: .infinity)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(style: StrokeStyle(lineWidth: 1, dash: [5, 5])) // Dashed line
-                                .foregroundColor(Color("TileHeading"))
-                        )
-                        .onTapGesture {
-                            addNewDevice()
-                        }
+                        
+                        Spacer()
+                        
+                        Text(errorMessage ?? "No devices found")
+                            .font(.footnote)
+                            .foregroundColor(.gray)
+                            .padding()
                     }
-                    .padding()
+                    .refreshable {
+                        loadDevicesFromServer()
+                    }
                     
-                    Spacer()
-                    
-                    Text(errorMessage ?? "No devices found")
-                        .foregroundColor(.gray)
-                        .padding()
                 } else {
                     ScrollView {
                         LazyVGrid(
@@ -165,29 +175,46 @@ struct UserHome: View {
                     .padding(.top, 10)
             }
             .padding(.top)
-            .navigationTitle("Hi, \(username)")
-            .navigationBarTitleDisplayMode(.inline) // Keeps the title inline
+            //.navigationBarTitleDisplayMode(.inline) // Keeps the title inline
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {
-                        isAppMenuvisible.toggle()
-                    }) {
-                        Image(systemName: "person.crop.circle").foregroundColor(Color("NavbarItemsColor"))
-                    }
-                }
-                
-                // Right-side button (Settings icon)
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        loadDevicesFromServer()
-                    }) {
-                        Image(systemName: "arrow.clockwise.circle").foregroundColor(Color("NavbarItemsColor"))
+                ToolbarItemGroup(placement: .navigationBarLeading) {
+                    HStack {
+                        Button(action: {
+                            isAppMenuvisible.toggle()
+                        }) {
+                            Image(systemName: "person.crop.circle")
+                                .foregroundColor(Color("NavbarItemsColor"))
+                                .font(.title2)
+                        }
+                        
+                        Text("Hi, \(username)")
+                            .font(.title2)
+                            .foregroundColor(Color("NavbarItemsColor")) // Matches system title color
                     }
                 }
             }
             .sheet(isPresented: $isAppMenuvisible) {
                 VStack {
                     List {
+                        Button(action: {
+                            // Trigger function
+                            isAppMenuvisible.toggle()
+                        }) {
+                            Label("App settings", systemImage: "gearshape")
+                        }
+                        Button(action: {
+                            // Trigger function
+                            isAppMenuvisible.toggle()
+                        }) {
+                            Label("Analytics", systemImage: "chart.line.downtrend.xyaxis.circle")
+                        }
+                        Button(action: {
+                            // Trigger function
+                            isAppMenuvisible.toggle()
+                        }) {
+                            Label("Automations", systemImage: "repeat.1.circle")
+                        }
                         Button(role: .destructive, action: {
                             logoutUser()
                             isAppMenuvisible.toggle()
@@ -199,7 +226,7 @@ struct UserHome: View {
                     .listStyle(PlainListStyle())
                     .frame(maxWidth: .infinity)
                 }
-                .presentationDetents([.fraction(0.2)])
+                .presentationDetents([.fraction(0.3)])
             }
             .onAppear(perform: loadDevicesLocally) // Load saved devices
             .sheet(isPresented: $isDeviceSettingModalShowing) {
@@ -222,7 +249,7 @@ struct UserHome: View {
             // Decode the data into a [Device] array
             devices = try JSONDecoder().decode([Device].self, from: savedData)
             if devices.isEmpty {
-                errorMessage = "No devices found locally. Getting devices from server..."
+                errorMessage = "No saved devices."
                 loadDevicesFromServer()
             }
 //            print("Devices retrieved successfully from UserDefaults.")
@@ -282,6 +309,7 @@ struct UserHome: View {
     }
     
     private func logoutUser() {
+        // TODO: cancel all network tasks to prevent unexpected response when logged in as a different user, while old network call is still waiting for a server response.
         saveDeviceArrayLocally(devices: []) // clear devices from local storage
         UserDefaults.standard.set("", forKey: "user_id") // clear saved user id
         UserDefaults.standard.set("", forKey: "username") // clear saved username

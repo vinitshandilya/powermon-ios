@@ -17,6 +17,8 @@
 		C79C3EB428DF33D400EE8EAE /* MQTTManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C3EB328DF33D400EE8EAE /* MQTTManager.swift */; };
 		C79C3EB828DF353200EE8EAE /* Reading.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C3EB728DF353200EE8EAE /* Reading.swift */; };
 		C79C3EC028DF753700EE8EAE /* ConnStatusBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C3EBF28DF753700EE8EAE /* ConnStatusBar.swift */; };
+		C7AB6DF12D1ECE0900032FF3 /* WifiSetupInstructions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AB6DF02D1ECE0900032FF3 /* WifiSetupInstructions.swift */; };
+		C7AB6DF32D1EE47300032FF3 /* LEDView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AB6DF22D1EE47300032FF3 /* LEDView.swift */; };
 		C7DD59432D1B2DF30025C547 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DD59422D1B2DF30025C547 /* LoginView.swift */; };
 		C7DD59452D1B2E320025C547 /* CreateAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DD59442D1B2E320025C547 /* CreateAccountView.swift */; };
 		C7DD59472D1B31680025C547 /* UserHome.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DD59462D1B31680025C547 /* UserHome.swift */; };
@@ -34,6 +36,8 @@
 		C79C3EB328DF33D400EE8EAE /* MQTTManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MQTTManager.swift; sourceTree = "<group>"; };
 		C79C3EB728DF353200EE8EAE /* Reading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reading.swift; sourceTree = "<group>"; };
 		C79C3EBF28DF753700EE8EAE /* ConnStatusBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnStatusBar.swift; sourceTree = "<group>"; };
+		C7AB6DF02D1ECE0900032FF3 /* WifiSetupInstructions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WifiSetupInstructions.swift; sourceTree = "<group>"; };
+		C7AB6DF22D1EE47300032FF3 /* LEDView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LEDView.swift; sourceTree = "<group>"; };
 		C7DD59422D1B2DF30025C547 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		C7DD59442D1B2E320025C547 /* CreateAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountView.swift; sourceTree = "<group>"; };
 		C7DD59462D1B31680025C547 /* UserHome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserHome.swift; sourceTree = "<group>"; };
@@ -86,6 +90,8 @@
 				C79C3EBF28DF753700EE8EAE /* ConnStatusBar.swift */,
 				C7953E452D1895E40037CDF6 /* SettingsTab.swift */,
 				C7E474A12D1D4355009BBA26 /* Device.swift */,
+				C7AB6DF02D1ECE0900032FF3 /* WifiSetupInstructions.swift */,
+				C7AB6DF22D1EE47300032FF3 /* LEDView.swift */,
 			);
 			path = Powermon;
 			sourceTree = "<group>";
@@ -179,8 +185,10 @@
 				C79C3EA328DF2F9F00EE8EAE /* ContentView.swift in Sources */,
 				C7953E462D1895E40037CDF6 /* SettingsTab.swift in Sources */,
 				C79C3EB428DF33D400EE8EAE /* MQTTManager.swift in Sources */,
+				C7AB6DF12D1ECE0900032FF3 /* WifiSetupInstructions.swift in Sources */,
 				C7DD59452D1B2E320025C547 /* CreateAccountView.swift in Sources */,
 				C79C3EC028DF753700EE8EAE /* ConnStatusBar.swift in Sources */,
+				C7AB6DF32D1EE47300032FF3 /* LEDView.swift in Sources */,
 				C79C3EB828DF353200EE8EAE /* Reading.swift in Sources */,
 				C7DD59472D1B31680025C547 /* UserHome.swift in Sources */,
 				C7DD59492D1BBF9B0025C547 /* DeviceDetails.swift in Sources */,
