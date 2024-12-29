@@ -19,7 +19,7 @@ struct LEDView: View {
         if blink {
             Circle()
                 .fill(color)
-                .frame(width: 20, height: 20)
+                .frame(width: 7, height: 7)
                 .opacity(isBlinking ? 1 : 0) // Completely transparent in the off state
                 .shadow(color: color.opacity(isBlinking ? 1 : 0), radius: 40, x: 0, y: 0) // Glow matches the blink
                 .overlay(Circle().stroke(color, lineWidth: 0.2)) // Optional border for consistent outline
@@ -32,7 +32,7 @@ struct LEDView: View {
         } else {
             Circle()
                 .fill(color)
-                .frame(width: 10, height: 10)
+                .frame(width: 7, height: 7)
                 .shadow(color: color.opacity(0.5), radius: 10, x: 0, y: 0) // Glowing effect
                 .overlay(Circle().stroke(color, lineWidth: 4))
                 .padding(.trailing, 5)

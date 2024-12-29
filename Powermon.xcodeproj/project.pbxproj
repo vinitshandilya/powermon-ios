@@ -7,7 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		C7953E462D1895E40037CDF6 /* SettingsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7953E452D1895E40037CDF6 /* SettingsTab.swift */; };
+		C77BF4442D1FC32B00CB8A67 /* ProgressSpinner.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77BF4432D1FC32B00CB8A67 /* ProgressSpinner.swift */; };
+		C77BF4462D1FDCFE00CB8A67 /* MeterSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77BF4452D1FDCFE00CB8A67 /* MeterSettings.swift */; };
 		C79C3EA128DF2F9F00EE8EAE /* PowermonApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C3EA028DF2F9F00EE8EAE /* PowermonApp.swift */; };
 		C79C3EA328DF2F9F00EE8EAE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C3EA228DF2F9F00EE8EAE /* ContentView.swift */; };
 		C79C3EA528DF2FA100EE8EAE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C79C3EA428DF2FA100EE8EAE /* Assets.xcassets */; };
@@ -24,10 +25,12 @@
 		C7DD59472D1B31680025C547 /* UserHome.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DD59462D1B31680025C547 /* UserHome.swift */; };
 		C7DD59492D1BBF9B0025C547 /* DeviceDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DD59482D1BBF9B0025C547 /* DeviceDetails.swift */; };
 		C7E474A22D1D4355009BBA26 /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E474A12D1D4355009BBA26 /* Device.swift */; };
+		C7E961D82D21596D00EABB9E /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E961D72D21596D00EABB9E /* Config.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		C7953E452D1895E40037CDF6 /* SettingsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTab.swift; sourceTree = "<group>"; };
+		C77BF4432D1FC32B00CB8A67 /* ProgressSpinner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressSpinner.swift; sourceTree = "<group>"; };
+		C77BF4452D1FDCFE00CB8A67 /* MeterSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeterSettings.swift; sourceTree = "<group>"; };
 		C79C3E9D28DF2F9F00EE8EAE /* Powermon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Powermon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C79C3EA028DF2F9F00EE8EAE /* PowermonApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowermonApp.swift; sourceTree = "<group>"; };
 		C79C3EA228DF2F9F00EE8EAE /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -43,6 +46,7 @@
 		C7DD59462D1B31680025C547 /* UserHome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserHome.swift; sourceTree = "<group>"; };
 		C7DD59482D1BBF9B0025C547 /* DeviceDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceDetails.swift; sourceTree = "<group>"; };
 		C7E474A12D1D4355009BBA26 /* Device.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
+		C7E961D72D21596D00EABB9E /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,10 +92,12 @@
 				C79C3EB328DF33D400EE8EAE /* MQTTManager.swift */,
 				C79C3EB728DF353200EE8EAE /* Reading.swift */,
 				C79C3EBF28DF753700EE8EAE /* ConnStatusBar.swift */,
-				C7953E452D1895E40037CDF6 /* SettingsTab.swift */,
 				C7E474A12D1D4355009BBA26 /* Device.swift */,
 				C7AB6DF02D1ECE0900032FF3 /* WifiSetupInstructions.swift */,
 				C7AB6DF22D1EE47300032FF3 /* LEDView.swift */,
+				C77BF4432D1FC32B00CB8A67 /* ProgressSpinner.swift */,
+				C77BF4452D1FDCFE00CB8A67 /* MeterSettings.swift */,
+				C7E961D72D21596D00EABB9E /* Config.swift */,
 			);
 			path = Powermon;
 			sourceTree = "<group>";
@@ -183,7 +189,8 @@
 			files = (
 				C7E474A22D1D4355009BBA26 /* Device.swift in Sources */,
 				C79C3EA328DF2F9F00EE8EAE /* ContentView.swift in Sources */,
-				C7953E462D1895E40037CDF6 /* SettingsTab.swift in Sources */,
+				C7E961D82D21596D00EABB9E /* Config.swift in Sources */,
+				C77BF4462D1FDCFE00CB8A67 /* MeterSettings.swift in Sources */,
 				C79C3EB428DF33D400EE8EAE /* MQTTManager.swift in Sources */,
 				C7AB6DF12D1ECE0900032FF3 /* WifiSetupInstructions.swift in Sources */,
 				C7DD59452D1B2E320025C547 /* CreateAccountView.swift in Sources */,
@@ -191,6 +198,7 @@
 				C7AB6DF32D1EE47300032FF3 /* LEDView.swift in Sources */,
 				C79C3EB828DF353200EE8EAE /* Reading.swift in Sources */,
 				C7DD59472D1B31680025C547 /* UserHome.swift in Sources */,
+				C77BF4442D1FC32B00CB8A67 /* ProgressSpinner.swift in Sources */,
 				C7DD59492D1BBF9B0025C547 /* DeviceDetails.swift in Sources */,
 				C7DD59432D1B2DF30025C547 /* LoginView.swift in Sources */,
 				C79C3EA128DF2F9F00EE8EAE /* PowermonApp.swift in Sources */,

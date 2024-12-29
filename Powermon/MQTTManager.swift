@@ -27,6 +27,10 @@ class MQTTManager: CocoaMQTTDelegate, ObservableObject {
         let _ = staticMQTT.mqttClient.connect()
     }
     
+    func disconnectMQTT() {
+        staticMQTT.mqttClient.disconnect()
+    }
+    
     func mqtt(_ mqtt: CocoaMQTT, didConnectAck ack: CocoaMQTTConnAck) {
         print("Mqtt didConnectAck", ack.description)
         

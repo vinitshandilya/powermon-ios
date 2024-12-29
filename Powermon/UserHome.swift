@@ -1,21 +1,19 @@
 import SwiftUI
 
 struct UserHome: View {
-    private var nodeServer: String = "https://wattwise-k1f5.onrender.com"
-    @StateObject var mqttmanager = MQTTManager()
+    private var nodeServer: String = Config.nodeServer
+    private var updateDeviceNameUrl: String = Config.updateDeviceNameUrl
+//    @StateObject var mqttmanager = MQTTManager()
     @State private var devices: [Device] = []
     @State private var errorMessage: String? = nil
     @State private var user_id: String = UserDefaults.standard.string(forKey: "user_id") ?? ""
     @State private var username: String = UserDefaults.standard.string(forKey: "username") ?? ""
-    @State private var isDeviceSettingModalShowing: Bool = false
-    @State private var newDevice: Device? = nil
-    @State private var subscribetopic: String = "intopic"
-    @State private var publishtopic: String = "outtopic"
     @State private var waitingForServerResponse: Bool = false
     @State private var editingDeviceID: String? = nil
     @State private var newDeviceName: String = ""
     @State private var isAppMenuvisible = false
     @FocusState private var isTextFieldFocused: Bool
+    @State private var waitMessage: String = "Please wait."
     
     private var colors: [Color] = [Color("Tile1"), Color("Tile2"), Color("Tile3"), Color("Tile4"), Color("Tile5")]
     
@@ -29,23 +27,23 @@ struct UserHome: View {
                             spacing: 20 // Row spacing
                         ) {
                             // Add new device button
-                            VStack {
-                                Spacer()
-                                Text("+ Add New")
-                                    .font(.body)
-                                    .foregroundColor(.gray)
-                                Spacer()
+                            NavigationLink(destination: MeterSettings()) {
+                                VStack {
+                                    Spacer()
+                                    Text("+ Add New")
+                                        .font(.body)
+                                        .foregroundColor(.gray)
+                                    Spacer()
+                                }
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(style: StrokeStyle(lineWidth: 1, dash: [5, 5])) // Dashed line
+                                        .foregroundColor(Color("TileHeading"))
+                                )
                             }
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(style: StrokeStyle(lineWidth: 1, dash: [5, 5])) // Dashed line
-                                    .foregroundColor(Color("TileHeading"))
-                            )
-                            .onTapGesture {
-                                addNewDevice()
-                            }
+                            
                         }
                         .padding()
                         
@@ -135,23 +133,23 @@ struct UserHome: View {
                             }
 
                             // Add new device button
-                            VStack {
-                                Spacer()
-                                Text("+ Add New")
-                                    .font(.body)
-                                    .foregroundColor(.gray)
-                                Spacer()
+                            NavigationLink(destination: MeterSettings()) {
+                                VStack {
+                                    Spacer()
+                                    Text("+ Add New")
+                                        .font(.body)
+                                        .foregroundColor(.gray)
+                                    Spacer()
+                                }
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(style: StrokeStyle(lineWidth: 1, dash: [5, 5])) // Dashed line
+                                        .foregroundColor(.gray)
+                                )
                             }
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(style: StrokeStyle(lineWidth: 1, dash: [5, 5])) // Dashed line
-                                    .foregroundColor(.gray)
-                            )
-                            .onTapGesture {
-                                addNewDevice()
-                            }
+                            
                         }
                         .padding() // Adds padding around the entire grid
                     }
@@ -162,11 +160,7 @@ struct UserHome: View {
                 }
                 
                 if(waitingForServerResponse) {
-                    HStack {
-                        ProgressView().scaleEffect(0.8)
-                        Text("Please wait...")
-                    }
-                    .foregroundColor(.gray)
+                    ProgressSpinner(progressText: waitMessage)
                 }
 
                 Text("WattWise, Copyright © 2025")
@@ -228,17 +222,15 @@ struct UserHome: View {
                 }
                 .presentationDetents([.fraction(0.3)])
             }
-            .onAppear(perform: loadDevicesLocally) // Load saved devices
-            .sheet(isPresented: $isDeviceSettingModalShowing) {
-                // pass new device bundle to Settings page for further configuration.
-                if let newDevice = newDevice {
-                    SettingsTab(device: newDevice, mqttmanager: mqttmanager, newonboarding: true)
-                }
+            .onAppear {
+                loadDevicesLocally()
+                print(devices.count)
             }
         }
     }
     
     private func loadDevicesLocally() {
+        print("UserHome: onAppear: Loading devices locally")
         guard let savedData = UserDefaults.standard.data(forKey: "savedDevices") else {
             print("No saved devices found in UserDefaults.")
             devices = []
@@ -246,66 +238,17 @@ struct UserHome: View {
         }
         
         do {
-            // Decode the data into a [Device] array
             devices = try JSONDecoder().decode([Device].self, from: savedData)
+            print("Decoded devices count: \(devices.count)")
             if devices.isEmpty {
                 errorMessage = "No saved devices."
                 loadDevicesFromServer()
             }
-//            print("Devices retrieved successfully from UserDefaults.")
+            print("Devices retrieved successfully from UserDefaults.")
         } catch {
             print("Failed to decode devices from UserDefaults: \(error.localizedDescription)")
             devices = []
         }
-    }
-    
-    private func addNewDevice() {
-        waitingForServerResponse = true
-        guard let url = URL(string: "\(nodeServer)/add-device") else {
-            errorMessage = "Invalid URL"
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
-        let body = ["user_id": user_id]
-        request.httpBody = try? JSONSerialization.data(withJSONObject: body, options: [])
-        
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                DispatchQueue.main.async {
-                    errorMessage = "Error: \(error.localizedDescription)"
-                    waitingForServerResponse = false
-                }
-                return
-            }
-            
-            guard let data = data else {
-                DispatchQueue.main.async {
-                    errorMessage = "No data received"
-                    waitingForServerResponse = false
-                }
-                return
-            }
-            
-            do {
-                let newDevice = try JSONDecoder().decode(Device.self, from: data)
-                DispatchQueue.main.async {
-                    waitingForServerResponse = false
-                    self.newDevice = newDevice
-                    self.devices.append(newDevice)
-                    saveDeviceArrayLocally(devices: self.devices)
-                    self.isDeviceSettingModalShowing = true
-                }
-            } catch {
-                DispatchQueue.main.async {
-                    waitingForServerResponse = false
-                    errorMessage = "Failed to decode response"
-                }
-            }
-        }.resume()
     }
     
     private func logoutUser() {
@@ -341,6 +284,7 @@ struct UserHome: View {
     
     private func loadDevicesFromServer() {
         waitingForServerResponse = true
+        waitMessage = "Getting your devices from cloud."
         guard let url = URL(string: "\(nodeServer)/get-devices?user_id=\(user_id)") else {
             errorMessage = "Invalid URL"
             return
@@ -388,16 +332,17 @@ struct UserHome: View {
             }
             
         }.resume()
-        
-        // Ensure this does not interfere with the data fetch
-        DispatchQueue.global().async {
-            mqttmanager.configureMQTT()
-        }
+//        
+//        // Ensure this does not interfere with the data fetch
+//        DispatchQueue.global().async {
+//            mqttmanager.configureMQTT()
+//        }
     }
     
     func updateDeviceName(deviceID: String, deviceName: String) {
         waitingForServerResponse = true
-        guard let url = URL(string: "https://wattwise-k1f5.onrender.com/update-device-name") else {
+        waitMessage = "Updating device name."
+        guard let url = URL(string: updateDeviceNameUrl) else {
             print("Invalid URL")
             return
         }
@@ -463,6 +408,7 @@ struct UserHome: View {
     
     func deleteDeviceFromServer(device: Device) {
         waitingForServerResponse = true
+        waitMessage = "Deleting device from cloud."
         guard let url = URL(string: "\(nodeServer)/delete-device") else {
             print("Invalid URL")
             return
@@ -530,23 +476,4 @@ struct UserHome: View {
             }
         }.resume()
     }
-    //    private func saveSingleDeviceLocally(newDevice: Device) {
-    //        // Retrieve existing devices from UserDefaults
-    //        loadDevicesLocally()
-    //
-    //        // Add the new device to the array
-    //        devices.append(newDevice)
-    //
-    //        // Save the updated array back to UserDefaults
-    //        do {
-    //            let encodedData = try JSONEncoder().encode(devices)
-    //            UserDefaults.standard.set(encodedData, forKey: "savedDevices")
-    //            print("Device added and saved successfully to UserDefaults.")
-    //        } catch {
-    //            print("Failed to encode and save the device: \(error.localizedDescription)")
-    //        }
-    //    }
-    
-    
-    
 }
