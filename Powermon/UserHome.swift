@@ -2,7 +2,6 @@ import SwiftUI
 
 struct UserHome: View {
     private var nodeServer: String = Config.nodeServer
-    private var updateDeviceNameUrl: String = Config.updateDeviceNameUrl
 //    @StateObject var mqttmanager = MQTTManager()
     @State private var devices: [Device] = []
     @State private var errorMessage: String? = nil
@@ -342,7 +341,7 @@ struct UserHome: View {
     func updateDeviceName(deviceID: String, deviceName: String) {
         waitingForServerResponse = true
         waitMessage = "Updating device name."
-        guard let url = URL(string: updateDeviceNameUrl) else {
+        guard let url = URL(string: Config.nodeServer.appending("/update-device-name")) else {
             print("Invalid URL")
             return
         }

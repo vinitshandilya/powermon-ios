@@ -5,10 +5,10 @@ class MQTTManager: CocoaMQTTDelegate, ObservableObject {
     @Published var reading: Reading = Reading()
     @Published var isMqttConnected: Bool = false
     let clientID = "iphone12_\(UUID().uuidString.prefix(6))"
-    let host = UserDefaults.standard.string(forKey: "broker") ?? "broker.hivemq.com"
-    let savedPort = UserDefaults.standard.integer(forKey: "port")
-    let username = UserDefaults.standard.string(forKey: "username") ?? ""
-    let mqttpassword = UserDefaults.standard.string(forKey: "mqttpassword") ?? ""
+    let host = Config.broker
+    let port = Config.brokerPort
+    let mqttuser = Config.mqttuser
+    let mqttpassword = Config.mqttpassword
     var publishtopic: String = ""
     var subscribetopic: String = ""
     
@@ -18,10 +18,11 @@ class MQTTManager: CocoaMQTTDelegate, ObservableObject {
     }
     
     func configureMQTT() {
-        let port: UInt16 = savedPort == 0 ? 1883 : UInt16(savedPort)
-        staticMQTT.mqttClient = CocoaMQTT(clientID: clientID, host: host, port: port)
-        staticMQTT.mqttClient.username = username
-        staticMQTT.mqttClient.password = mqttpassword
+        staticMQTT.mqttClient = CocoaMQTT(clientID: clientID, host: host, port: UInt16(port)!) // TODO: Do not force unwrap!
+        if (!mqttuser.isEmpty && !mqttpassword.isEmpty) {
+            staticMQTT.mqttClient.username = mqttuser
+            staticMQTT.mqttClient.password = mqttpassword
+        }
         staticMQTT.mqttClient.keepAlive = 60
         staticMQTT.mqttClient.delegate = self
         let _ = staticMQTT.mqttClient.connect()

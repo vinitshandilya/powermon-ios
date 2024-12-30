@@ -2,16 +2,13 @@ import SwiftUI
 
 struct MeterSettings: View {
     @Environment(\.scenePhase) var scenePhase
-    let nodeServer: String = Config.nodeServer
-    let espConfigUrl: String = Config.espConfigUrl
-    let espKnockUrl: String = Config.espKnockUrl
     @State private var broker: String = Config.broker
     @State private var port: String = Config.brokerPort
     @State private var user_id: String = UserDefaults.standard.string(forKey: "user_id") ?? ""
     @State private var ssid: String = UserDefaults.standard.string(forKey: "ssid") ?? ""
     @State private var password: String = UserDefaults.standard.string(forKey: "password") ?? ""
-    @State private var username: String = ""
-    @State private var mqttpassword: String = ""
+    @State private var username: String = Config.mqttuser
+    @State private var mqttpassword: String = Config.mqttpassword
     @State private var publishtopic: String = ""
     @State private var subscribetopic: String = ""
     @State private var autoreconnect: Bool = UserDefaults.standard.bool(forKey: "autoreconnect")
@@ -21,14 +18,15 @@ struct MeterSettings: View {
     @State private var isSubmitting: Bool = false
     @State var isESPReachable: Bool = false
     @State var espSearchTimedOut = false
-    @State var serverError: String = ""
+    @State var nodeServerError: String = ""
+    @State var espServerError: String = ""
     @State var waitingForNodeServer: Bool = false
     @State var espServerResponse: String = ""
-    @State var isSearchineESP: Bool = false
+    @State var isSearchingESP: Bool = false
     
     
     var body: some View {
-        VStack(spacing: 20) {
+        ScrollView {
             Image(systemName: "house.badge.wifi.fill")
                 .resizable()
                 .scaledToFit()
@@ -37,7 +35,7 @@ struct MeterSettings: View {
                 .padding(.top, 40)
             
             // Heading
-            Text("Setup your device")
+            Text("Add New Device")
                 .font(.title)
                 .fontWeight(.bold)
             
@@ -45,87 +43,162 @@ struct MeterSettings: View {
             VStack(alignment: .leading, spacing: 10) {
                 if waitingForNodeServer {
                     HStack(alignment: .top, spacing: 10) {
-                        Image(systemName: "checkmark.circle.fill")
-                        Text("Creating device in cloud...")
                         ProgressView().scaleEffect(0.8)
+                        Text("Adding device to your account. Please wait...")
+                            .multilineTextAlignment(.leading)
+                            .lineLimit(nil) // Allow unlimited lines
+                            .fixedSize(horizontal: false, vertical: true) // Allow wrapping
                     }.foregroundColor(.gray)
                 } else {
-                    if serverError.isEmpty {
+                    if nodeServerError.isEmpty {
                         HStack(alignment: .top, spacing: 10) {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.green)
-                            Text("New device created!")
+                            Text("●").foregroundColor(.green)
+                            Text("Success! Device added to your account.")
+                                .multilineTextAlignment(.leading)
+                                .lineLimit(nil) // Allow unlimited lines
+                                .fixedSize(horizontal: false, vertical: true) // Allow wrapping
                         }
                     } else {
                         HStack(alignment: .top, spacing: 10) {
-                            Image(systemName: "xmark.circle.fill")
-                                .foregroundColor(.red)
-                            Text("An error occurred: \(serverError).")
+                            Text("●").foregroundColor(.red)
+                            Text("There was an issue adding your device. Please check your connection.")
+                                .multilineTextAlignment(.leading)
+                                .lineLimit(nil) // Allow unlimited lines
+                                .fixedSize(horizontal: false, vertical: true) // Allow wrapping
                         }
                     }
                 }
                 
-                if isESPReachable {
+                if isESPReachable { // Device discovered!
                     HStack(alignment: .top, spacing: 10) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(.green)
-                        Text("New device found [\(espServerResponse)]")
+                        Text("●").foregroundColor(.green)
+                        Text("Device discovered in your home network: [\(espServerResponse)]")
+                            .multilineTextAlignment(.leading)
+                            .lineLimit(nil) // Allow unlimited lines
+                            .fixedSize(horizontal: false, vertical: true) // Allow wrapping
                     }
-                } else if espSearchTimedOut {
+                    if nodeServerError.isEmpty { // Also, device created on backend
+                        Text("Connect your device to your home network. It will reboot automatically once the setup is complete.")
+                            .multilineTextAlignment(.leading)
+                            .lineLimit(nil) // Allow unlimited lines
+                            .fixedSize(horizontal: false, vertical: true) // Allow wrapping
+                            .padding(.vertical)
+                        
+                        HStack {
+                            Label("Name", systemImage: "wifi") // SF Symbol for Wi-Fi
+                                .frame(width: 100, alignment: .leading)
+                            TextField("Network Name", text: $ssid)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .padding(.leading)
+                        }
+                        
+                        HStack {
+                            Label("Password", systemImage: "lock.fill") // SF Symbol for lock
+                                .frame(width: 100, alignment: .leading)
+                            SecureField("Network Password", text: $password)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .padding(.leading)
+                        }
+                        
+                        HStack {
+                            Label("Auto-Reconnect", systemImage: "arrow.triangle.2.circlepath") // SF Symbol for auto-reconnect
+                                .frame(alignment: .leading)
+                            Toggle("", isOn: $autoreconnect)
+                                .toggleStyle(SwitchToggleStyle())
+                        }
+                        
+                        
+                        Button(action: {
+                            hideKeyboard()
+                            saveLocalSettings()
+                            saveSettingsOnMeter()
+                        }) {
+                            if isSubmitting {
+                                ProgressView()
+                            } else {
+                                Text("Save")
+                                    .padding()
+                                    .background(Color("Tile3"))
+                                    .foregroundColor(.primary)
+                                    .cornerRadius(10)
+                                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color("TileHeading"), lineWidth: 0.5))
+                            }
+                        }
+                        .padding(.vertical)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .disabled(isSubmitting)
+                        .alert(item: $submitMessage) { message in
+                            Alert(title: Text("Configuration Status"), message: Text(message.text), dismissButton: .default(Text("OK")))
+                        }
+                    }
+                    
+                } else if espSearchTimedOut || !espServerError.isEmpty {
                     HStack(alignment: .top, spacing: 10) {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(.red)
-                        Text("No device found.")
+                        Text("●").foregroundColor(.red)
+                        Text("No nearby devices found. Please follow the steps below to manually add a device to your home network.")
+                            .multilineTextAlignment(.leading)
+                            .lineLimit(nil) // Allow unlimited lines
+                            .fixedSize(horizontal: false, vertical: true) // Allow wrapping
                     }
+                    .padding(.bottom)
+                    
+                    HStack(alignment: .top, spacing: 10) {
+                        Text("●")
+                        Text("Tap the Setup button on device and wait until the LED glows solid blue.")
+                            .multilineTextAlignment(.leading)
+                            .lineLimit(nil) // Allow unlimited lines
+                            .fixedSize(horizontal: false, vertical: true) // Allow wrapping
+                    }
+                    HStack(alignment: .top, spacing: 10) {
+                        Text("●")
+                        Text("Connect to the device's access point - \"pzem_AP\". The default password is '12345678910'.")
+                            .multilineTextAlignment(.leading)
+                            .lineLimit(nil) // Allow unlimited lines
+                            .fixedSize(horizontal: false, vertical: true) // Allow wrapping
+                    }
+                    Button(action: openWiFiSettings) {
+                        Text("Open Wi-Fi Settings")
+                            .padding()
+                            .background(Color("Tile3"))
+                            .foregroundColor(.primary)
+                            .cornerRadius(10)
+                            .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color("TileHeading"), lineWidth: 0.5))
+                    }
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.vertical)
+                    
+                    Text("To restart the setup, switch the device back to setup mode and try again.")
+                        .font(.footnote)
+                        .foregroundColor(.gray)
+                        .padding(.horizontal)
+                    
+                    
                 } else {
-                    if isSearchineESP {
+                    if isSearchingESP {
                         HStack(alignment: .top, spacing: 10) {
-                            Image(systemName: "checkmark.circle.fill")
-                            Text("Searching device...")
+                            // Image(systemName: "checkmark.circle.fill")
                             ProgressView().scaleEffect(0.8)
+                            Text("Finding nearby devices in your network.")
+                                .multilineTextAlignment(.leading)
+                                .lineLimit(nil) // Allow unlimited lines
+                                .fixedSize(horizontal: false, vertical: true)
+                            
                         }.foregroundColor(.gray)
                     } else {
                         HStack(alignment: .top, spacing: 10) {
-                            Image(systemName: "checkmark.circle.fill")
-                            Text("Waiting for device discovery")
+                            Text("●")
+                            Text("Waiting for device discovery.")
+                                .multilineTextAlignment(.leading)
+                                .lineLimit(nil) // Allow unlimited lines
+                                .fixedSize(horizontal: false, vertical: true) // Allow wrapping
+                            Spacer() // Push the text to wrap
                         }.foregroundColor(.gray)
                     }
                     
                 }
-                
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 16)
-            
-            ScrollView {
-                WifiSetupInstructions()
-                
-                
-                TextField("SSID", text: $ssid)
-                SecureField("Password", text: $password)
-                Toggle("Auto-Reconnect", isOn: $autoreconnect)
-                
-                // Save button
-                Button(action: {
-                    hideKeyboard()
-                    saveLocalSettings()
-                    saveSettingsOnMeter()
-                }) {
-                    if isSubmitting {
-                        ProgressView()
-                    } else {
-                        Text("Save Configuration on Device")
-                    }
-                }
-                .disabled(isSubmitting)
-                .alert(item: $submitMessage) { message in
-                    Alert(title: Text("Configuration Status"), message: Text(message.text), dismissButton: .default(Text("OK")))
-                }
-                
-                
-                
-            }
-            
+            .padding()
         }
         .onAppear {
             print("onAppear")
@@ -135,25 +208,26 @@ struct MeterSettings: View {
         .onChange(of: scenePhase) { newPhase in
             print(newPhase)
             if newPhase == .active {
-                if waitingForNodeServer || !serverError.isEmpty {
+                if waitingForNodeServer || !nodeServerError.isEmpty { // TODO: What if the device addition fails. Need to restart adding device
                     print("restarting adding new device")
                 } else {
                     print("device already added successfully on server. Skipping adding new device")
-                    if !isESPReachable && (isSearchineESP || espSearchTimedOut) {
+                    if !isESPReachable && (isSearchingESP || espSearchTimedOut || !espServerError.isEmpty) {
                         print("restarting ESP reachability test. isESPReachable: \(isESPReachable)")
                         testESPReachability()
                     }
                 }
             }
         }
+        Spacer()
     } // UI View ends here
     
     
     // Custom functions
     func addNewDevice() {
         waitingForNodeServer = true
-        guard let url = URL(string: "\(nodeServer)/add-device") else {
-            serverError = "URL exception!"
+        guard let url = URL(string: Config.nodeServer.appending("/add-device")) else {
+            nodeServerError = "URL exception!"
             waitingForNodeServer = false
             return
         }
@@ -169,7 +243,7 @@ struct MeterSettings: View {
             if let error = error {
                 DispatchQueue.main.async {
                     // errorMessage = "Error: \(error.localizedDescription)"
-                    serverError = "Error: \(error.localizedDescription)"
+                    nodeServerError = "Error: \(error.localizedDescription)"
                     waitingForNodeServer = false
                 }
                 return
@@ -178,7 +252,7 @@ struct MeterSettings: View {
             guard let data = data else {
                 DispatchQueue.main.async {
                     // errorMessage = "No data received"
-                    serverError = "No data received!"
+                    nodeServerError = "No data received!"
                     waitingForNodeServer = false
                 }
                 return
@@ -187,7 +261,7 @@ struct MeterSettings: View {
             do {
                 newDevice = try JSONDecoder().decode(Device.self, from: data)
                 DispatchQueue.main.async {
-                    serverError = ""
+                    nodeServerError = ""
                     waitingForNodeServer = false
                     devices.append(newDevice!) // TODO: DO NOT Force unwrap!
                     print("new device created on server and saved locally. Total device count: \(devices.count)")
@@ -197,7 +271,7 @@ struct MeterSettings: View {
                 }
             } catch {
                 DispatchQueue.main.async {
-                    serverError = "Failed to decode response"
+                    nodeServerError = "Failed to decode response"
                     waitingForNodeServer = false
                 }
             }
@@ -265,7 +339,7 @@ struct MeterSettings: View {
         }
         
         // Send settings data to ESP
-        guard let url = URL(string: espConfigUrl) else {
+        guard let url = URL(string: Config.espServer.appending("/setconfig")) else {
             submitMessage = SubmitMessage(text: "Invalid server URL.")
             isSubmitting = false
             return
@@ -315,15 +389,16 @@ struct MeterSettings: View {
     
     func testESPReachability() {
         // Create a URL for the ESP module's web server
-        isSearchineESP = true
+        isSearchingESP = true
         espSearchTimedOut = false
         isESPReachable = false
         espServerResponse = ""
+        espServerError = ""
         
-        guard let url = URL(string: espKnockUrl) else {
+        guard let url = URL(string: Config.espServer.appending("/knock")) else {
             print("Invalid URL")
             isESPReachable = false
-            isSearchineESP = false
+            isSearchingESP = false
             return
         }
         
@@ -338,14 +413,16 @@ struct MeterSettings: View {
         let task = session.dataTask(with: url) { data, response, error in
             if let error = error {
                 // Handle error (e.g., no network, unreachable, or timeout)
+                isESPReachable = false
+                isSearchingESP = false
                 if (error as NSError).code == NSURLErrorTimedOut {
-                    print("Request timed out")
+                    espServerError = "Request timed out"
+                    print(espServerError)
                     espSearchTimedOut = true
                 } else {
+                    espServerError = "\(error.localizedDescription)"
                     print("Error: \(error.localizedDescription)")
                 }
-                isESPReachable = false
-                isSearchineESP = false
                 return
             }
             
@@ -354,7 +431,7 @@ struct MeterSettings: View {
                 if httpResponse.statusCode == 200 {
                     print("ESP module is reachable!")
                     isESPReachable = true
-                    isSearchineESP = false
+                    isSearchingESP = false
                     espSearchTimedOut = false
                     // Attempt to read the response data
                     if let responseData = data {
@@ -368,12 +445,21 @@ struct MeterSettings: View {
                 } else {
                     print("ESP module returned an error: \(httpResponse.statusCode)")
                     isESPReachable = false
-                    isSearchineESP = false
+                    isSearchingESP = false
                     espSearchTimedOut = false
+                    espServerError = "\(httpResponse.statusCode)"
                 }
             }
         }
         task.resume()
+    }
+    
+    func openWiFiSettings() {
+        if let url = URL(string: "App-prefs:WIFI") {
+            if UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url)
+            }
+        }
     }
 
 }
