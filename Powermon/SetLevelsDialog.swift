@@ -9,35 +9,43 @@ struct SetLevelsDialog: View {
     
     var body: some View {
         NavigationView {
-            VStack {
+            VStack(alignment: .leading, spacing: 20) {
+                Text("You can set the nominal and high usage levels for your device. An alarm will sound when the watt usage exceeds the alarm level.")
+                
                 // Slider for Maximum Usage
                 VStack(alignment: .leading) {
-                    Text("Maximum Usage: \(Int(maximumUsage))")
+                    Text("Alarm Threshold: \(Int(maximumUsage))")
                     Slider(value: $maximumUsage, in: 100...10000, step: 50)
                 }
-                .padding()
+                .padding(.top, 20)
+                .foregroundColor(.gray)
                 
                 // Slider for Nominal Usage
                 VStack(alignment: .leading) {
-                    Text("Nominal Usage: \(Int(nominalUsage))")
+                    Text("Nominal threshold: \(Int(nominalUsage))")
                     Slider(value: $nominalUsage, in: 50...min(maximumUsage, 1000), step: 10)
                 }
-                .padding()
+                .foregroundColor(.gray)
                 
                 // Save Button with Validation
-                Button("Save") {
-                    if nominalUsage <= maximumUsage {
-                        onSave(nominalUsage, maximumUsage)
-                        dismiss()
-                    } else {
-                        print("Nominal Usage cannot be greater than Maximum Usage")
+                HStack {
+                    Spacer()
+                    Button("Save") {
+                        if nominalUsage <= maximumUsage {
+                            onSave(nominalUsage, maximumUsage)
+                            dismiss()
+                        } else {
+                            print("Nominal Usage cannot be greater than Maximum Usage")
+                        }
                     }
+                    .buttonStyle(.borderedProminent)
                 }
-                .buttonStyle(.borderedProminent)
-                .padding()
+                
+                Spacer()
             }
             .navigationTitle("Set Levels")
             .navigationBarItems(trailing: Button("Cancel") { dismiss() })
+            .padding()
         }
     }
 }

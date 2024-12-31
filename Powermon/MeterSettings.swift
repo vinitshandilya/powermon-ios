@@ -332,7 +332,9 @@ struct MeterSettings: View {
             "username": username,
             "mqttpassword": mqttpassword,
             "subscribetopic": newDevice!.subscribe_topic,
-            "publishtopic": newDevice!.publish_topic
+            "publishtopic": newDevice!.publish_topic,
+            "user_id": user_id,
+            "device_id": newDevice!.device_id
         ]
         if autoreconnect {
             parameters["autoreconnect"] = "true"

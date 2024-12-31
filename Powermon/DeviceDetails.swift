@@ -4,122 +4,133 @@ struct DeviceDetails: View {
     @Environment(\.scenePhase) var scenePhase // detects application lifecycle
     @StateObject var mqttmanager = MQTTManager()
     let device: Device
-    @State private var isPresentingConfirm: Bool = false
-    @State private var nominalUsage: String = UserDefaults.standard.string(forKey: "nominalUsage") ?? "500"
-    @State private var maximumUsage: String = UserDefaults.standard.string(forKey: "maximumUsage") ?? "1000"
-
+    @State private var isResetDialogShowing: Bool = false
+    @State private var nominalUsage: Double = UserDefaults.standard.double(forKey: "nominalUsage") == 0 ? 500 : UserDefaults.standard.double(forKey: "nominalUsage")
+    @State private var maximumUsage: Double = UserDefaults.standard.double(forKey: "maximumUsage") == 0 ? 1000 : UserDefaults.standard.double(forKey: "maximumUsage")
+    @State private var isLevelSetDialogShowing = false
+    
+    
     var body: some View {
-        VStack {
-            ConnStatusBar(status: mqttmanager.reading.level)
-
-            HStack {
-                if mqttmanager.isMqttConnected {
-                    Label("Connected", systemImage: "checkmark.circle.fill")
-                        .foregroundColor(.green)
-                } else {
-                    HStack {
-                        ProgressView().scaleEffect(0.8)
-                        Text("Connecting...")
+        
+        NavigationView {
+            ScrollView {
+                SemiCircularChart(value: mqttmanager.reading.power, minValue: nominalUsage, maxValue: maximumUsage, isMqttConnected: mqttmanager.isMqttConnected)
+                HStack(alignment: .top, spacing: 10) {
+                    VStack {
+                        HStack {
+                            Label("Units", systemImage: "powermeter")
+                            Spacer()
+                            Text(String(mqttmanager.reading.energy)).fontWeight(.light) + Text(" kWh").fontWeight(.light)
+                        }
+                        HStack {
+                            Label("Voltage", systemImage: "powerplug.portrait")
+                            Spacer()
+                            Text(String(mqttmanager.reading.voltage)).fontWeight(.light) + Text(" Volts").fontWeight(.light)
+                        }
+                        HStack {
+                            Label("Current", systemImage: "alternatingcurrent")
+                            Spacer()
+                            Text(String(mqttmanager.reading.current)).fontWeight(.light) + Text(" Amp").fontWeight(.light)
+                        }
+                        HStack {
+                            Label("Nominal", systemImage: "lessthanorequalto.circle")
+                            Spacer()
+                            Text(String(nominalUsage)).fontWeight(.light) + Text(" W").fontWeight(.light)
+                        }
                     }
-                    .foregroundColor(.gray)
-                }
-                Spacer()
-            }
-            .font(.footnote)
-            .padding()
-
-            HStack {
-                Label("Power", systemImage: "bolt.circle").fontWeight(.heavy)
-                Spacer()
-                Text(String(mqttmanager.reading.power)).fontWeight(.light) + Text(" W").fontWeight(.light)
-            }
-            HStack {
-                Label("Voltage", systemImage: "powerplug").fontWeight(.heavy)
-                Spacer()
-                Text(String(mqttmanager.reading.voltage)).fontWeight(.light) + Text(" V").fontWeight(.light)
-            }
-            HStack {
-                Label("Current", systemImage: "alternatingcurrent").fontWeight(.heavy)
-                Spacer()
-                Text(String(mqttmanager.reading.current)).fontWeight(.light) + Text(" A").fontWeight(.light)
-            }
-            HStack {
-                Label("Units", systemImage: "barometer").fontWeight(.heavy)
-                Spacer()
-                Text(String(mqttmanager.reading.energy)).fontWeight(.light) + Text(" kWh").fontWeight(.light)
-            }
-            HStack {
-                Label("Freq", systemImage: "waveform").fontWeight(.heavy)
-                Spacer()
-                Text(String(mqttmanager.reading.frequency)).fontWeight(.light) + Text(" Hz").fontWeight(.light)
-            }
-            HStack {
-                Label("PF", systemImage: "poweroff").fontWeight(.heavy)
-                Spacer()
-                Text(String(mqttmanager.reading.pf)).fontWeight(.light)
-            }
-            
-            
-            VStack(alignment: .leading) {
-                Text("Subscribe Topic:")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                Text(device.subscribe_topic)
-                    .font(.body)
-                    .foregroundColor(.primary)
-                Text("Publish Topic:")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                Text(device.publish_topic)
-                    .font(.body)
-                    .foregroundColor(.primary)
-            }
-
-            Section(header: Text("Set Limits")) {
-                TextField("Nominal Usage", text: $nominalUsage)
-                    .keyboardType(.numberPad)
-                TextField("Maximum Usage", text: $maximumUsage)
-                    .keyboardType(.numberPad)
-                Button(action: {
-                    // Extract the values and send them as comma-separated
-                    if let nominal = Double(nominalUsage), let maximum = Double(maximumUsage) {
-                        UserDefaults.standard.set(nominalUsage, forKey: "nominalUsage")
-                        UserDefaults.standard.set(maximumUsage, forKey: "maximumUsage")
-                        
-                        let message = "\(nominal),\(maximum)"
-                        mqttmanager.sendMessage(topic: device.subscribe_topic, message: message)
-                        hideKeyboard()
-                    } else {
-                        print("Invalid threshold values")
+                    
+                    Spacer()
+                    
+                    VStack {
+                        HStack {
+                            Label("Frequency", systemImage: "waveform")
+                            Spacer()
+                            Text(String(mqttmanager.reading.frequency)).fontWeight(.light) + Text(" Hz").fontWeight(.light)
+                        }
+                        HStack {
+                            Label("Power Factor", systemImage: "angle")
+                            Spacer()
+                            Text(String(mqttmanager.reading.pf)).fontWeight(.light)
+                        }
+                        HStack {
+                            Label("Usage", systemImage: "leaf.circle")
+                            Spacer()
+                            Text(String(mqttmanager.reading.level)).fontWeight(.light)
+                        }
+                        HStack {
+                            Label("Alarm", systemImage: "greaterthanorequalto.circle")
+                            Spacer()
+                            Text(String(maximumUsage)).fontWeight(.light) + Text(" W").fontWeight(.light)
+                        }
                     }
-                }) {
-                    Text("Set Limits")
+                    
                 }
+                .font(.footnote)
+                .padding()
             }
-            
-            
-            Button("Reset KWh", role: .destructive) {
-                isPresentingConfirm = true
-            }
-            .confirmationDialog("Are you sure?", isPresented: $isPresentingConfirm) {
-                // publishing "1" on intopic will reset the module
+            .confirmationDialog("Are you sure?", isPresented: $isResetDialogShowing) {
+                // publishing "1" on intopic will reset energy usage
                 Button("Reset usage?", role: .destructive) { mqttmanager.sendMessage(topic: device.subscribe_topic, message: "1")}
             }
             message: {
                 Text("Usage will be reset. You cannot undo this")
             }
+            
         }
         .navigationTitle(device.device_name)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Menu {
+                    Button(action: {
+                        print("Billing configuration")
+                    }) {
+                        Label("Billing", systemImage: "coloncurrencysign.circle")
+                    }
+                    
+                    Button(action: {
+                        isLevelSetDialogShowing = true
+                    }) {
+                        Label("Set Levels", systemImage: "slider.horizontal.2.arrow.trianglehead.counterclockwise")
+                    }
+                    
+                    Button(role: .destructive, action: {
+                        isResetDialogShowing = true
+                    }) {
+                        Label("Reset kWh", systemImage: "arrow.clockwise.circle")
+                    }
+                } label: {
+                    Image(systemName: "ellipsis")
+                        .imageScale(.large)
+                        .foregroundColor(.gray)
+                        .padding(10)
+                        .contentShape(Rectangle())
+                }
+            }
+        }
+        .sheet(isPresented: $isLevelSetDialogShowing) {
+            SetLevelsDialog(
+                nominalUsage: $nominalUsage,
+                maximumUsage: $maximumUsage,
+                onSave: { nominal, maximum in
+                    // Save to UserDefaults
+                    UserDefaults.standard.set(nominal, forKey: "nominalUsage")
+                    UserDefaults.standard.set(maximum, forKey: "maximumUsage")
+                    
+                    // Send via MQTT
+                    let message = "\(Int(nominal)),\(Int(maximum))"
+                    mqttmanager.sendMessage(topic: device.subscribe_topic, message: message)
+                }
+            )
+        }
         .onAppear {
             print("onAppear")
             if !mqttmanager.isMqttConnected {
-                mqttmanager.updateTopics(pub: device.publish_topic, sub: device.subscribe_topic)
+                mqttmanager.updateTopics(pub: device.publish_topic, sub: device.subscribe_topic) // publish to common topic
                 
                 DispatchQueue.global().async {
                     mqttmanager.configureMQTT()
                 }
                 
-                // mqttmanager.configureMQTT()
             }
         }
         .onDisappear() {
@@ -143,10 +154,10 @@ struct DeviceDetails: View {
                 }
             }
         }
+        
     }
     
     func hideKeyboard() {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 }
-

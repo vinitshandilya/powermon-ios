@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C705FF452D23027D00781E1E /* SemiCircularChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = C705FF442D23027D00781E1E /* SemiCircularChart.swift */; };
+		C705FF472D23C38F00781E1E /* SetLevelsDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = C705FF462D23C38F00781E1E /* SetLevelsDialog.swift */; };
 		C77BF4442D1FC32B00CB8A67 /* ProgressSpinner.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77BF4432D1FC32B00CB8A67 /* ProgressSpinner.swift */; };
 		C77BF4462D1FDCFE00CB8A67 /* MeterSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77BF4452D1FDCFE00CB8A67 /* MeterSettings.swift */; };
 		C79C3EA128DF2F9F00EE8EAE /* PowermonApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C3EA028DF2F9F00EE8EAE /* PowermonApp.swift */; };
@@ -17,7 +19,6 @@
 		C79C3EB228DF2FD900EE8EAE /* CocoaMQTTWebSocket in Frameworks */ = {isa = PBXBuildFile; productRef = C79C3EB128DF2FD900EE8EAE /* CocoaMQTTWebSocket */; };
 		C79C3EB428DF33D400EE8EAE /* MQTTManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C3EB328DF33D400EE8EAE /* MQTTManager.swift */; };
 		C79C3EB828DF353200EE8EAE /* Reading.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C3EB728DF353200EE8EAE /* Reading.swift */; };
-		C79C3EC028DF753700EE8EAE /* ConnStatusBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C3EBF28DF753700EE8EAE /* ConnStatusBar.swift */; };
 		C7AB6DF32D1EE47300032FF3 /* LEDView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AB6DF22D1EE47300032FF3 /* LEDView.swift */; };
 		C7DD59432D1B2DF30025C547 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DD59422D1B2DF30025C547 /* LoginView.swift */; };
 		C7DD59452D1B2E320025C547 /* CreateAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DD59442D1B2E320025C547 /* CreateAccountView.swift */; };
@@ -28,6 +29,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		C705FF442D23027D00781E1E /* SemiCircularChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SemiCircularChart.swift; sourceTree = "<group>"; };
+		C705FF462D23C38F00781E1E /* SetLevelsDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetLevelsDialog.swift; sourceTree = "<group>"; };
 		C77BF4432D1FC32B00CB8A67 /* ProgressSpinner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressSpinner.swift; sourceTree = "<group>"; };
 		C77BF4452D1FDCFE00CB8A67 /* MeterSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeterSettings.swift; sourceTree = "<group>"; };
 		C79C3E9D28DF2F9F00EE8EAE /* Powermon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Powermon.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -37,7 +40,6 @@
 		C79C3EA728DF2FA100EE8EAE /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		C79C3EB328DF33D400EE8EAE /* MQTTManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MQTTManager.swift; sourceTree = "<group>"; };
 		C79C3EB728DF353200EE8EAE /* Reading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reading.swift; sourceTree = "<group>"; };
-		C79C3EBF28DF753700EE8EAE /* ConnStatusBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnStatusBar.swift; sourceTree = "<group>"; };
 		C7AB6DF22D1EE47300032FF3 /* LEDView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LEDView.swift; sourceTree = "<group>"; };
 		C7DD59422D1B2DF30025C547 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		C7DD59442D1B2E320025C547 /* CreateAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountView.swift; sourceTree = "<group>"; };
@@ -87,14 +89,15 @@
 				C7DD59442D1B2E320025C547 /* CreateAccountView.swift */,
 				C7DD59462D1B31680025C547 /* UserHome.swift */,
 				C7DD59482D1BBF9B0025C547 /* DeviceDetails.swift */,
+				C705FF462D23C38F00781E1E /* SetLevelsDialog.swift */,
 				C79C3EB328DF33D400EE8EAE /* MQTTManager.swift */,
 				C79C3EB728DF353200EE8EAE /* Reading.swift */,
-				C79C3EBF28DF753700EE8EAE /* ConnStatusBar.swift */,
 				C7E474A12D1D4355009BBA26 /* Device.swift */,
 				C7AB6DF22D1EE47300032FF3 /* LEDView.swift */,
 				C77BF4432D1FC32B00CB8A67 /* ProgressSpinner.swift */,
 				C77BF4452D1FDCFE00CB8A67 /* MeterSettings.swift */,
 				C7E961D72D21596D00EABB9E /* Config.swift */,
+				C705FF442D23027D00781E1E /* SemiCircularChart.swift */,
 			);
 			path = Powermon;
 			sourceTree = "<group>";
@@ -190,10 +193,11 @@
 				C77BF4462D1FDCFE00CB8A67 /* MeterSettings.swift in Sources */,
 				C79C3EB428DF33D400EE8EAE /* MQTTManager.swift in Sources */,
 				C7DD59452D1B2E320025C547 /* CreateAccountView.swift in Sources */,
-				C79C3EC028DF753700EE8EAE /* ConnStatusBar.swift in Sources */,
+				C705FF452D23027D00781E1E /* SemiCircularChart.swift in Sources */,
 				C7AB6DF32D1EE47300032FF3 /* LEDView.swift in Sources */,
 				C79C3EB828DF353200EE8EAE /* Reading.swift in Sources */,
 				C7DD59472D1B31680025C547 /* UserHome.swift in Sources */,
+				C705FF472D23C38F00781E1E /* SetLevelsDialog.swift in Sources */,
 				C77BF4442D1FC32B00CB8A67 /* ProgressSpinner.swift in Sources */,
 				C7DD59492D1BBF9B0025C547 /* DeviceDetails.swift in Sources */,
 				C7DD59432D1B2DF30025C547 /* LoginView.swift in Sources */,
