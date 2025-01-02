@@ -3,8 +3,10 @@ import SwiftUI
 struct DeviceDetails: View {
     let device: Device
     @Environment(\.scenePhase) var scenePhase // detects application lifecycle
-    @ObservedObject var mqttmanager = MQTTManager()
+    @StateObject var mqttmanager = MQTTManager()
     @ObservedObject var chartViewModel = PowerDataViewModel()
+    @State private var selectedTab = 0
+    @State private var slideOffset: CGFloat = -150
     @State private var user_id: String = UserDefaults.standard.string(forKey: "user_id") ?? ""
     @State private var isResetDialogShowing: Bool = false
     @State private var nominalUsage: Double = UserDefaults.standard.double(forKey: "nominalUsage") == 0 ? 500 : UserDefaults.standard.double(forKey: "nominalUsage")
@@ -70,43 +72,90 @@ struct DeviceDetails: View {
                 .font(.footnote)
                 .padding()
                 
-                // Bar chart
-                VStack(alignment: .center, spacing: 20) {
-                    Text("Power Consumption Over Time")
-                        .font(.title3)
-                        .padding()
-                    
-                    if chartViewModel.chartpoints.isEmpty {
-                        Text("Loading...")
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
-                    } else {
-                        // Chart Bars
-                        HStack(alignment: .bottom, spacing: 5) {
-                            ForEach(chartViewModel.chartpoints) { reading in
-                                VStack {
-                                    Text("\(reading.power) W    ")
-                                        .font(.footnote)
-                                        .rotationEffect(.degrees(90))
-                                        .fixedSize()
-                                        .frame(width: 40, alignment: .center)
-                                    Rectangle()
-                                        .fill(Color.blue)
-                                        .frame(width: 20, height: CGFloat(reading.power) / 10) // Scale the power
-                                    Text(formatTime(reading.timestamp))
-                                        .font(.caption)
-                                        .rotationEffect(.degrees(90))
-                                        .padding(.top)
-                                }
+                // Tabs:
+                VStack {
+                    // Custom Tab Bar (Top Row)
+                    HStack {
+                        TabButton(title: "Hours", isSelected: selectedTab == 0, action: {
+                            withAnimation {
+                                selectedTab = 0
+                                slideOffset = -150 // Reset offset for Tab1
                             }
-                        }
-                        .padding()
+                        })
+                        Spacer()
+                        TabButton(title: "Days", isSelected: selectedTab == 1, action: {
+                            withAnimation {
+                                selectedTab = 1
+                                slideOffset = 0 // Set offset for Tab2 (adjust as needed)
+                            }
+                        })
+                        Spacer()
+                        TabButton(title: "Weeks", isSelected: selectedTab == 2, action: {
+                            withAnimation {
+                                selectedTab = 2
+                                slideOffset = 150 // Set offset for Tab3 (adjust as needed)
+                            }
+                        })
+                    }
+                    .background(Color("TabRowBackground"))
+                    
+                    // Sliding Indicator
+                    Rectangle()
+                        .fill(Color("TabButtonColor"))
+                        .frame(width: 60, height: 4) // Indicator height
+                        .cornerRadius(2)
+                        .offset(x: slideOffset) // Animate the offset
+                        .animation(.easeInOut(duration: 0.3), value: slideOffset) // Add slide animation
+                    
+                    // page indicator
+                    HStack(alignment: .center, spacing: 10) {
+                        selectedTab == 0 ? Text("●").foregroundColor(.green) : Text("●").foregroundColor(.gray)
+                        selectedTab == 1 ? Text("●").foregroundColor(.green) : Text("●").foregroundColor(.gray)
+                        selectedTab == 2 ? Text("●").foregroundColor(.green) : Text("●").foregroundColor(.gray)
+                    }
+                    .font(.footnote)
+                    
+                    if selectedTab == 0 {
+                        // Show hourly chart
+                        VStack(alignment: .center, spacing: 20) {
+                            Text("Hourly Usage")
+                                .font(.title3)
+                                .padding()
+                            
+                            if chartViewModel.chartpoints.isEmpty {
+                                Text("Loading...")
+                                    .font(.subheadline)
+                                    .foregroundColor(.gray)
+                            } else {
+                                // Chart Bars
+                                HStack(alignment: .bottom, spacing: 5) {
+                                    ForEach(chartViewModel.chartpoints) { reading in
+                                        VStack {
+                                            Text("\(reading.power) W    ")
+                                                .font(.footnote)
+                                                .rotationEffect(.degrees(90))
+                                                .fixedSize()
+                                                .frame(width: 40, alignment: .center)
+                                            Rectangle()
+                                                .fill(Color("TabButtonColor"))
+                                                .frame(width: 20, height: CGFloat(reading.power) / 10) // Scale the power
+                                            Text(formatTime(reading.timestamp))
+                                                .font(.caption)
+                                                .rotationEffect(.degrees(90))
+                                                .padding(.top)
+                                        }
+                                    }
+                                }
+                                .padding()
+                            }
+                        }.transition(.slide)
+                        
+                    } else if selectedTab == 1 {
+                        Text("Daily Usage").font(.title3).padding()
+                    } else {
+                        Text("Weekly Usage").font(.title3).padding()
                     }
                 }
-                
-                
-                
-                
             }
             .confirmationDialog("Are you sure?", isPresented: $isResetDialogShowing) {
                 // publishing "1" on intopic will reset energy usage
@@ -211,5 +260,25 @@ struct DeviceDetails: View {
             return formatter.string(from: date)
         }
         return timestamp
+    }
+}
+
+struct TabButton: View {
+    var title: String
+    var isSelected: Bool
+    var action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .fontWeight(.light)
+                .padding(.horizontal, 20)  // Horizontal padding for width
+                .padding(.vertical, 5)
+                .frame(minWidth: 50)
+                .background(isSelected ? Color("TabButtonColor") : Color.clear)
+                .foregroundColor(isSelected ? .white : .gray)
+                .cornerRadius(3)
+        }
+        .padding(.vertical, 3)
     }
 }
