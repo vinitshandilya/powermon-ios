@@ -72,6 +72,7 @@ struct DeviceDetails: View {
                 .font(.footnote)
                 .padding()
                 
+                
                 // Tabs:
                 TabView(selection: $selectedTab) {
                     // First Tab for hourly trend
@@ -107,7 +108,13 @@ struct DeviceDetails: View {
                             .padding()
                         }
                     }
+                    .background(
+                        RoundedRectangle(cornerRadius: 10) // Rounded rectangle as background
+                            .fill(Color("CardBg")) // Card color
+                            .shadow(color: .black.opacity(0.3), radius: 5, x: 0, y: 5) // Add shadow
+                    )
                     .tag(0)
+                    
                     
                     // Second tab for daily trend
                     Text("Days")
@@ -129,6 +136,11 @@ struct DeviceDetails: View {
                     selectedTab == 2 ? Text("●").foregroundColor(.green) : Text("●").foregroundColor(.gray)
                 }
                 .font(.footnote)
+                
+                
+                
+                
+                
                 
             }
             .confirmationDialog("Are you sure?", isPresented: $isResetDialogShowing) {
