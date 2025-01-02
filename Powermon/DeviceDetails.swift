@@ -1,9 +1,11 @@
 import SwiftUI
 
 struct DeviceDetails: View {
-    @Environment(\.scenePhase) var scenePhase // detects application lifecycle
-    @StateObject var mqttmanager = MQTTManager()
     let device: Device
+    @Environment(\.scenePhase) var scenePhase // detects application lifecycle
+    @ObservedObject var mqttmanager = MQTTManager()
+    @ObservedObject var chartViewModel = PowerDataViewModel()
+    @State private var user_id: String = UserDefaults.standard.string(forKey: "user_id") ?? ""
     @State private var isResetDialogShowing: Bool = false
     @State private var nominalUsage: Double = UserDefaults.standard.double(forKey: "nominalUsage") == 0 ? 500 : UserDefaults.standard.double(forKey: "nominalUsage")
     @State private var maximumUsage: Double = UserDefaults.standard.double(forKey: "maximumUsage") == 0 ? 1000 : UserDefaults.standard.double(forKey: "maximumUsage")
@@ -67,6 +69,44 @@ struct DeviceDetails: View {
                 }
                 .font(.footnote)
                 .padding()
+                
+                // Bar chart
+                VStack(alignment: .center, spacing: 20) {
+                    Text("Power Consumption Over Time")
+                        .font(.title3)
+                        .padding()
+                    
+                    if chartViewModel.chartpoints.isEmpty {
+                        Text("Loading...")
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                    } else {
+                        // Chart Bars
+                        HStack(alignment: .bottom, spacing: 5) {
+                            ForEach(chartViewModel.chartpoints) { reading in
+                                VStack {
+                                    Text("\(reading.power) W    ")
+                                        .font(.footnote)
+                                        .rotationEffect(.degrees(90))
+                                        .fixedSize()
+                                        .frame(width: 40, alignment: .center)
+                                    Rectangle()
+                                        .fill(Color.blue)
+                                        .frame(width: 20, height: CGFloat(reading.power) / 10) // Scale the power
+                                    Text(formatTime(reading.timestamp))
+                                        .font(.caption)
+                                        .rotationEffect(.degrees(90))
+                                        .padding(.top)
+                                }
+                            }
+                        }
+                        .padding()
+                    }
+                }
+                
+                
+                
+                
             }
             .confirmationDialog("Are you sure?", isPresented: $isResetDialogShowing) {
                 // publishing "1" on intopic will reset energy usage
@@ -124,6 +164,7 @@ struct DeviceDetails: View {
         }
         .onAppear {
             print("onAppear")
+            chartViewModel.fetchPowerData(userId: user_id, deviceId: device.device_id)
             if !mqttmanager.isMqttConnected {
                 mqttmanager.updateTopics(pub: device.publish_topic, sub: device.subscribe_topic) // publish to common topic
                 
@@ -159,5 +200,16 @@ struct DeviceDetails: View {
     
     func hideKeyboard() {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
+    
+    // Helper to format the timestamp to a readable time string
+    func formatTime(_ timestamp: String) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        if let date = formatter.date(from: timestamp) {
+            formatter.dateFormat = "h a"
+            return formatter.string(from: date)
+        }
+        return timestamp
     }
 }

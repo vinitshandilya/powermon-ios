@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct UserHome: View {
-    private var nodeServer: String = Config.nodeServer
 //    @StateObject var mqttmanager = MQTTManager()
     @State private var devices: [Device] = []
     @State private var errorMessage: String? = nil
@@ -284,7 +283,7 @@ struct UserHome: View {
     private func loadDevicesFromServer() {
         waitingForServerResponse = true
         waitMessage = "Getting your devices from cloud."
-        guard let url = URL(string: "\(nodeServer)/get-devices?user_id=\(user_id)") else {
+        guard let url = URL(string: "\(Config.nodeServer)/get-devices?user_id=\(user_id)") else {
             errorMessage = "Invalid URL"
             return
         }
@@ -408,7 +407,7 @@ struct UserHome: View {
     func deleteDeviceFromServer(device: Device) {
         waitingForServerResponse = true
         waitMessage = "Deleting device from cloud."
-        guard let url = URL(string: "\(nodeServer)/delete-device") else {
+        guard let url = URL(string: "\(Config.nodeServer)/delete-device") else {
             print("Invalid URL")
             return
         }
