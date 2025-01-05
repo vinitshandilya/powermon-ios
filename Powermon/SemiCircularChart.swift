@@ -27,18 +27,19 @@ struct SemiCircularChart: View {
                     VStack(alignment: .center) {
                         // Display value in kW if value exceeds 1100
                         if value > 1100 {
-                            Text(String(format: "%.3f", value / 1000.0))
+                            Text(String(format: "%.2f", value / 1000.0))
                                 .font(.title)
+                                .fontWeight(.black)
                             Text("kW")
                                 .font(.body)
                         } else {
                             Text(String(value))
                                 .font(.title)
+                                .fontWeight(.black)
                             Text("Watts")
                                 .font(.body)
                         }
                     }
-                    .fontWeight(.bold)
                     .foregroundColor(getColor(for: value))
                 } else {
                     ProgressView().scaleEffect(0.8)
