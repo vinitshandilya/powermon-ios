@@ -2,22 +2,24 @@ import CocoaMQTT
 import Foundation
 
 class MQTTManager: CocoaMQTTDelegate, ObservableObject {
-    @Published var reading: Reading = Reading()
+    @Published var reading: MQTTReading = MQTTReading()
     @Published var isMqttConnected: Bool = false
+    @Published var isMqttSubscribed: Bool = false
+    @Published var publishedOK: Bool = false
     let clientID = "iphone12_\(UUID().uuidString.prefix(6))"
     let host = Config.broker
     let port = Config.brokerPort
     let mqttuser = Config.mqttuser
     let mqttpassword = Config.mqttpassword
-    var publishtopic: String = ""
-    var subscribetopic: String = ""
+//    var publishtopic: String = ""
+//    var subscribetopic: String = ""
     
-    func updateTopics(pub: String, sub: String) {
-        self.publishtopic = pub
-        self.subscribetopic = sub
-    }
+//    func updateTopics(pub: String, sub: String) {
+//        self.publishtopic = pub
+//        self.subscribetopic = sub
+//    }
     
-    func configureMQTT() {
+    func connectToMqtt() { // connect to broker
         staticMQTT.mqttClient = CocoaMQTT(clientID: clientID, host: host, port: UInt16(port)!) // TODO: Do not force unwrap!
         if (!mqttuser.isEmpty && !mqttpassword.isEmpty) {
             staticMQTT.mqttClient.username = mqttuser
@@ -28,32 +30,47 @@ class MQTTManager: CocoaMQTTDelegate, ObservableObject {
         let _ = staticMQTT.mqttClient.connect()
     }
     
-    func disconnectMQTT() {
+    func subscribeToTopic(subscribetopic: String) {
+        staticMQTT.mqttClient.subscribe(subscribetopic)
+    }
+    
+    func mqtt(_ mqtt: CocoaMQTT, didConnectAck ack: CocoaMQTTConnAck) { // mqtt connection callback
+        print("mqtt connection", ack.description)
+        if ack.description == "accept" {
+            mqtt.subscribe(Config.globalTopic)
+            isMqttConnected = true
+        } else {
+            isMqttConnected = false
+        }
+    }
+    
+    func disconnectMQTT() { // disconnect from broker
         staticMQTT.mqttClient.disconnect()
     }
     
-    func mqtt(_ mqtt: CocoaMQTT, didConnectAck ack: CocoaMQTTConnAck) {
-        print("Mqtt didConnectAck", ack.description)
-        
-        if ack.description == "accept" {
-            mqtt.subscribe(publishtopic)
-            isMqttConnected = true
-        } else {
-            print("broker connection failed!")
-            isMqttConnected = false
-        }
-        
+    func mqttDidDisconnect(_ mqtt: CocoaMQTT, withError err: Error?) { // mqtt disconnection callback
+        print("mqtt disconnected, \(err?.localizedDescription ?? "")")
+        isMqttSubscribed = false
+        isMqttConnected = false
     }
     
-    func mqtt(_ mqtt: CocoaMQTT, didPublishMessage message: CocoaMQTTMessage, id: UInt16) {
+    func publishMessage(topic:String, message:String){ // publish message
+        print("message to publish from mqttmanager: \(message)")
+        staticMQTT.mqttClient.publish(topic, withString: message)
+    }
+    
+    func mqtt(_ mqtt: CocoaMQTT, didPublishMessage message: CocoaMQTTMessage, id: UInt16) { // message published callback
         print("Message published on topic \(message.topic) with payload \(message.string!)")
     }
     
-    func mqtt(_ mqtt: CocoaMQTT, didPublishAck id: UInt16) {
+    func mqtt(_ mqtt: CocoaMQTT, didPublishAck id: UInt16) { // message published callback status
+        print("mqtt didPublishAck", id.description)
+        publishedOK = true
         
+        // TODO: We need to ack command submission too
     }
     
-    func mqtt(_ mqtt: CocoaMQTT, didReceiveMessage message: CocoaMQTTMessage, id: UInt16) {
+    func mqtt(_ mqtt: CocoaMQTT, didReceiveMessage message: CocoaMQTTMessage, id: UInt16) { // message received
         print("Received message on topic: \(message.topic) with payload: \(String(describing: message.string))")
         let readingData = message.string ?? ""
         
@@ -63,7 +80,9 @@ class MQTTManager: CocoaMQTTDelegate, ObservableObject {
         }
         
         do {
-            reading = try JSONDecoder().decode(Reading.self, from: jsonData)
+            // listens to all devices' readings!! :( // TODO: Is it safe??
+            reading = try JSONDecoder().decode(MQTTReading.self, from: jsonData)
+            // print("userid: \(reading.user_id), deviceid: \(reading.device_id)")
         } catch {
             print("Failed to decode message into Reading: \(String(describing: message.string))")
             return
@@ -71,12 +90,14 @@ class MQTTManager: CocoaMQTTDelegate, ObservableObject {
     }
 
     
-    func mqtt(_ mqtt: CocoaMQTT, didSubscribeTopics success: NSDictionary, failed: [String]) {
-            
+    func mqtt(_ mqtt: CocoaMQTT, didSubscribeTopics success: NSDictionary, failed: [String]) { // mqtt subscribed callback
+        print("mqtt didSubscribeTopics, \(success.description)")
+        isMqttSubscribed = true
     }
     
-    func mqtt(_ mqtt: CocoaMQTT, didUnsubscribeTopics topics: [String]) {
-        
+    func mqtt(_ mqtt: CocoaMQTT, didUnsubscribeTopics topics: [String]) { // mqtt unsubscribe callback
+        print("mqtt didUnsubscribeTopics, \(topics.description)")
+        isMqttSubscribed = false
     }
     
     func mqttDidPing(_ mqtt: CocoaMQTT) {
@@ -87,17 +108,8 @@ class MQTTManager: CocoaMQTTDelegate, ObservableObject {
         
     }
     
-    func mqttDidDisconnect(_ mqtt: CocoaMQTT, withError err: Error?) {
-        
-    }
-    
     struct staticMQTT {
         static var mqttClient: CocoaMQTT!
-    }
-    
-    func sendMessage(topic:String, message:String){
-        print("message to publish from mqttmanager: \(message)")
-        staticMQTT.mqttClient.publish(topic, withString: message)
     }
     
 }

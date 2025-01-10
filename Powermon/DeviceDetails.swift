@@ -2,47 +2,95 @@ import SwiftUI
 
 struct DeviceDetails: View {
     let device: Device
-    @Environment(\.scenePhase) var scenePhase // detects application lifecycle
-    @StateObject var mqttmanager = MQTTManager()
-    @StateObject var chartViewModel = ReadingsViewModel()
+    @StateObject var mqttmanager: MQTTManager
+    @EnvironmentObject var navigationManager: NavigationManager
+    @Environment(\.scenePhase) var scenePhase
+    @Environment(\.dismiss) private var dismiss
+    @StateObject var energyChartViewModel = EnergyChartViewModel()
     @State private var selectedTab = 0
-    @State private var slideOffset: CGFloat = -150
     @State private var user_id: String = UserDefaults.standard.string(forKey: "user_id") ?? ""
     @State private var isResetDialogShowing: Bool = false
     @State private var nominalUsage: Double = UserDefaults.standard.double(forKey: "nominalUsage") == 0 ? 500 : UserDefaults.standard.double(forKey: "nominalUsage")
     @State private var maximumUsage: Double = UserDefaults.standard.double(forKey: "maximumUsage") == 0 ? 1000 : UserDefaults.standard.double(forKey: "maximumUsage")
     @State private var isLevelSetDialogShowing = false
+    @State private var showLineChart = false
+    @State private var isSeeMoreSheetShowing: Bool = false
+    @StateObject private var snackBarManager = SnackBarManager()
+    
+    var isRightDevice: Bool {
+        device.device_id == mqttmanager.reading.device_id
+    }
     
     
     var body: some View {
-        
-        NavigationView {
+        ZStack {
             VStack {
-                SemiCircularChart(value: mqttmanager.reading.power, minValue: nominalUsage, maxValue: maximumUsage, isMqttConnected: mqttmanager.isMqttConnected)
-                loadReadingDetailView().padding(.vertical)
-                TabView(selection: $selectedTab) {
-                    loadChartView(category: "byHour").tag(0)
-                    loadChartView(category: "byDay").tag(1)
-                    loadChartView(category: "byWeek").tag(2)
-                    loadChartView(category: "byMonth").tag(3)
+                OutlineButton()
+                    .padding(.vertical, 10)
+                    .onTapGesture {
+                        isSeeMoreSheetShowing = true
+                    }
+                
+                RingWidgetTable(device_id: device.device_id,
+                                reading: mqttmanager.reading,
+                                minValue: nominalUsage,
+                                maxValue: maximumUsage,
+                                isMqttConnected: mqttmanager.isMqttConnected)
+                
+                Spacer()
+                
+                if showLineChart {
+                    VStack {
+                        Text("Energy Usage Trend")
+                        Spacer()
+                        ScrollableLineChartView(usages: energyChartViewModel.hourlyReadings)
+                    }
+                } else { // show bar chart
+                    TabView(selection: $selectedTab) {
+                        loadChartView(category: "byHour").tag(0)
+                        loadChartView(category: "byDay").tag(1)
+                        loadChartView(category: "byWeek").tag(2)
+                        loadChartView(category: "byMonth").tag(3)
+                    }
+                    .tabViewStyle(.page(indexDisplayMode: .never))
+                    .indexViewStyle(.page(backgroundDisplayMode: .never))
+                    .onChange(of: selectedTab) { newValue in
+                        print("Current page: \(newValue)")
+                    }
+                    pageIndicator()
                 }
-                .tabViewStyle(.page(indexDisplayMode: .never))
-                .indexViewStyle(.page(backgroundDisplayMode: .never))
-                .onChange(of: selectedTab) { newValue in
-                    print("Current page: \(newValue)")
-                }
-                pageIndicator()
-            }
-            .confirmationDialog("Are you sure?", isPresented: $isResetDialogShowing) {
-                Button("Reset usage?", role: .destructive) { mqttmanager.sendMessage(topic: device.subscribe_topic, message: "1")}
-            }
-            message: {
-                Text("Usage will be reset. You cannot undo this")
             }
             
+            SnackBarView(manager: snackBarManager)
+            
         }
-        .navigationTitle(device.device_name)
+        .confirmationDialog("Are you sure?", isPresented: $isResetDialogShowing) {
+            Button("Reset usage?", role: .destructive) { mqttmanager.publishMessage(topic: device.subscribe_topic, message: "1")}
+        }
+        message: {
+            Text("Usage will be reset. You cannot undo this")
+        }
+        .navigationTitle("")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
         .toolbar {
+            // Custom back button
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    dismiss()
+                }) {
+                    Image(systemName: "arrow.left")
+                        .foregroundColor(Color.primary)
+                }
+            }
+            // Page title and notification badge
+            ToolbarItem(placement: .principal) {
+                HStack(alignment: .center, spacing: 10) {
+                    Text(device.device_name).font(.headline)
+                    NotificationBadge(active: true)
+                }
+            }
+            // ... menu
             ToolbarItem(placement: .navigationBarTrailing) {
                 menu()
             }
@@ -58,40 +106,41 @@ struct DeviceDetails: View {
                     
                     // Send via MQTT
                     let message = "\(Int(nominal)),\(Int(maximum))"
-                    mqttmanager.sendMessage(topic: device.subscribe_topic, message: message)
+                    mqttmanager.publishMessage(topic: device.subscribe_topic, message: message)
                 }
             )
         }
+        .sheet(isPresented: $isSeeMoreSheetShowing) {
+            Text("See More!")
+        }
         .onAppear {
-            print("onAppear")
-            chartViewModel.fetchReadings(userId: user_id, deviceId: device.device_id)
-            if !mqttmanager.isMqttConnected {
-                mqttmanager.updateTopics(pub: device.publish_topic, sub: device.subscribe_topic) // publish to common topic
-                
+            print("DeviceDetails: onAppear")
+            print("device publishing on topic: \(device.publish_topic)")
+            print("device subscribed on topic: \(device.subscribe_topic)")
+            // Load usage chart only when coming from UserHome!
+            if navigationManager.lastVisitedView == "UserHome" {
                 DispatchQueue.global().async {
-                    mqttmanager.configureMQTT()
+                    energyChartViewModel.fetchReadings(userId: user_id, deviceId: device.device_id)
                 }
             }
+            navigationManager.lastVisitedView = "DeviceDetails"
         }
         .onDisappear() {
-            print("DevicePage went to background. Stopping MQTT client.")
-            if mqttmanager.isMqttConnected {
-                mqttmanager.disconnectMQTT()
-                print("MQTT client stopped")
-            } else {
-                print("MQTT client never connected!")
-            }
+            print("DeviceDetails: onDisappear")
         }
         .onChange(of: scenePhase) { newPhase in
-            print(newPhase)
+            print("DeviceDetails: \(newPhase)")
             if newPhase == .active {
-                if !mqttmanager.isMqttConnected {
-                    mqttmanager.updateTopics(pub: device.publish_topic, sub: device.subscribe_topic)
-                    // mqttmanager.configureMQTT()
-                    DispatchQueue.global().async {
-                        mqttmanager.configureMQTT()
-                    }
-                }
+                
+            }
+            if newPhase == .inactive {
+                
+            }
+        }
+        .onChange(of: mqttmanager.publishedOK) { itstrue in
+            if itstrue {
+                snackBarManager.show(message: "Message sent successfully")
+                mqttmanager.publishedOK = false
             }
         }
     }
@@ -101,96 +150,26 @@ struct DeviceDetails: View {
     }
     
     
-    func formatTime(_ timestamp: String) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-        formatter.timeZone = TimeZone.current  // Ensure it uses the local timezone
-        
-        if let date = formatter.date(from: timestamp) {
-            formatter.dateFormat = "HH:mm a"
-            //            print("raw timestamp: \(timestamp)")
-            //            print("formatted time: \(formatter.string(from: date))")
-            return formatter.string(from: date)
-        }
-        return timestamp
-    }
-    
-    func loadReadingDetailView() -> some View {
-        return HStack(alignment: .top, spacing: 10) {
-            VStack {
-                HStack {
-                    Label(" Units", systemImage: "powermeter")
-                    Spacer()
-                    Text(String(mqttmanager.reading.energy)) + Text(" kWh")
-                }
-                HStack {
-                    Label(" Voltage", systemImage: "powerplug.portrait")
-                    Spacer()
-                    Text(String(mqttmanager.reading.voltage)) + Text(" Volts")
-                }
-                HStack {
-                    Label("Current", systemImage: "alternatingcurrent")
-                    Spacer()
-                    Text(String(mqttmanager.reading.current)) + Text(" Amp")
-                }
-                HStack {
-                    Label(" Nominal", systemImage: "lessthanorequalto.circle")
-                    Spacer()
-                    Text(String(nominalUsage)) + Text(" W")
-                }
-            }
-            
-            Spacer()
-            
-            VStack {
-                HStack {
-                    Label(" Frequency", systemImage: "waveform")
-                    Spacer()
-                    Text(String(mqttmanager.reading.frequency)) + Text(" Hz")
-                }
-                HStack {
-                    Label("Power Factor", systemImage: "angle")
-                    Spacer()
-                    Text(String(mqttmanager.reading.pf))
-                }
-                HStack {
-                    Label(" Usage", systemImage: "leaf.circle")
-                    Spacer()
-                    Text(String(mqttmanager.reading.level))
-                }
-                HStack {
-                    Label(" Alarm", systemImage: "greaterthanorequalto.circle")
-                    Spacer()
-                    Text(String(maximumUsage)) + Text(" W")
-                }
-            }
-            
-        }
-        .font(.footnote)
-        .frame(maxWidth: .infinity)
-        .padding()
-    }
-    
     func loadChartView(category: String) -> some View {
-        var usages: [Usage] = []
+        var usages: [EnergyReading] = []
         var chartTitle: String = ""
         
         switch category {
         case "byHour":
-            usages = chartViewModel.hourlyReadings
-            chartTitle = "Units Used Per Hour"
+            usages = energyChartViewModel.hourlyReadings
+            chartTitle = "Units By Hour"
         case "byDay":
-            usages = chartViewModel.dailyReadings
+            usages = energyChartViewModel.dailyReadings
             chartTitle = "Daily Usage"
         case "byWeek":
-            usages = chartViewModel.weeklyReadings
+            usages = energyChartViewModel.weeklyReadings
             chartTitle = "Weekly Usage"
         case "byMonth":
-            usages = chartViewModel.monthlyReadings
+            usages = energyChartViewModel.monthlyReadings
             chartTitle = "Monthly Usage"
         default:
             usages = []
-            chartTitle = "Unknown Category"
+            chartTitle = "Getting past usage"
         }
         
         let view = VStack(alignment: .center, spacing: 20) { // root chart area card
@@ -198,46 +177,58 @@ struct DeviceDetails: View {
             Text(chartTitle)
                 .font(.body)
                 .fontWeight(.bold)
-                .foregroundStyle(.gray)
-                .padding()
+                .foregroundStyle(Color.primary)
+                .padding(.vertical)
             
-            if !chartViewModel.isDataLoaded {
-                Text("Loading...")
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
-            } else if usages.isEmpty {
-                Text("No data found.")
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
+            if !energyChartViewModel.isDataLoaded {
+                Spacer()
+                ProgressView().scaleEffect(0.8)
+                Spacer()
             } else {
-                CustomBarChart(usages: Array(usages.suffix(11)))
+                if !usages.isEmpty {
+                    CustomBarChart(usages: Array(usages.suffix(11)), category: category, chartTitle: chartTitle)
+                } else {
+                    Spacer()
+                    Text("No data available at this time")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                        .multilineTextAlignment(.center)
+                    Spacer()
+                }
             }
         }
-            .frame(width: UIScreen.main.bounds.width * 0.9, height: 330)
-            .background(
-                RoundedRectangle(cornerRadius: 10) // Rounded rectangle as background
-                    .fill(Color("CardBg")) // Card color
-                    .shadow(color: .black.opacity(0.3), radius: 5, x: 0, y: 5) // Add shadow
-            )
-            .padding()
-            
+            .frame(width: UIScreen.main.bounds.width * 0.9, height: 300)
+        //            .background(
+        //                RoundedRectangle(cornerRadius: 10) // Rounded rectangle as background
+        //                    .fill(Color("CardBg")) // Card color
+        //                    .shadow(color: .black.opacity(0.3), radius: 5, x: 0, y: 5) // Add shadow
+        //            )
+        
         return view
     }
     
     func pageIndicator() -> some View {
-        return HStack(alignment: .center, spacing: 10) {
+        return HStack(alignment: .center, spacing: 8) {
             selectedTab == 0 ? Text("●").foregroundColor(.green) : Text("●").foregroundColor(.gray)
             selectedTab == 1 ? Text("●").foregroundColor(.green) : Text("●").foregroundColor(.gray)
             selectedTab == 2 ? Text("●").foregroundColor(.green) : Text("●").foregroundColor(.gray)
             selectedTab == 3 ? Text("●").foregroundColor(.green) : Text("●").foregroundColor(.gray)
         }
-        .font(.footnote)
+        .font(.caption2)
     }
     
     func menu() -> some View {
         return Menu {
+            
+            Button(action: {
+                showLineChart.toggle()
+            }) {
+                showLineChart ? Label("Show Bar Chart", systemImage: "chart.bar.xaxis") : Label("Show Line Chart", systemImage: "chart.line.uptrend.xyaxis.circle")
+            }
+            
             Button(action: {
                 print("Billing configuration")
+                
             }) {
                 Label("Billing", systemImage: "coloncurrencysign.circle")
             }
@@ -247,12 +238,15 @@ struct DeviceDetails: View {
             }) {
                 Label("Set Levels", systemImage: "slider.horizontal.2.arrow.trianglehead.counterclockwise")
             }
+            .disabled(!isRightDevice)
             
             Button(role: .destructive, action: {
                 isResetDialogShowing = true
             }) {
                 Label("Reset kWh", systemImage: "arrow.clockwise.circle")
             }
+            .disabled(!isRightDevice)
+            
         } label: {
             Image(systemName: "ellipsis")
                 .imageScale(.large)

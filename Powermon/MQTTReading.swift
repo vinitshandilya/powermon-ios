@@ -7,7 +7,9 @@
 
 import Foundation
 
-struct Reading: Hashable, Codable {
+struct MQTTReading: Hashable, Codable {
+    var user_id: String = ""
+    var device_id: String = ""
     var voltage: Double = 0.00
     var current: Double = 0.00
     var power: Double = 0.000

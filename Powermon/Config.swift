@@ -7,4 +7,5 @@ struct Config {
     static let brokerPort: String = "1883"
     static let mqttuser: String = ""
     static let mqttpassword: String = ""
+    static let globalTopic: String = "wattwise/readings/all"
 }

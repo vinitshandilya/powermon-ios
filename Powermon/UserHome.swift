@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct UserHome: View {
-//    @StateObject var mqttmanager = MQTTManager()
+    @StateObject var mqttmanager = MQTTManager()
+    @Environment(\.scenePhase) var scenePhase
     @State private var devices: [Device] = []
     @State private var errorMessage: String? = nil
     @State private var user_id: String = UserDefaults.standard.string(forKey: "user_id") ?? ""
@@ -12,6 +13,8 @@ struct UserHome: View {
     @State private var isAppMenuvisible = false
     @FocusState private var isTextFieldFocused: Bool
     @State private var waitMessage: String = "Please wait."
+    
+    @StateObject private var navigationManager = NavigationManager()
     
     private var colors: [Color] = [Color("Tile1"), Color("Tile2"), Color("Tile3"), Color("Tile4"), Color("Tile5")]
     
@@ -64,7 +67,7 @@ struct UserHome: View {
                         ) {
                             ForEach(devices.indices, id: \.self) { index in
                                 let device = devices[index]
-                                NavigationLink(destination: DeviceDetails(device: device)) {
+                                NavigationLink(destination: DeviceDetails(device: device, mqttmanager: mqttmanager).environmentObject(navigationManager)) {
                                     VStack(alignment: .leading) {
                                         HStack { // Tile heading
                                             Label("Device", systemImage: "powermeter")
@@ -117,6 +120,37 @@ struct UserHome: View {
                                                 .lineLimit(1) // Limit the text to a single line
                                                 .truncationMode(.tail) // Truncate with ellipsis at the end
                                         }
+                                        
+                                        if mqttmanager.isMqttSubscribed {
+                                            if device.device_id == mqttmanager.reading.device_id {
+                                                Text("online")
+                                                    .font(.caption)
+                                                    .foregroundColor(.green)
+                                                    .padding(.vertical, 5) // Add some padding inside the label
+                                                    .padding(.horizontal, 10)
+                                                    .background(
+                                                        RoundedRectangle(cornerRadius: 10)
+                                                            .fill(Color.green.opacity(0.2)) // Use a subtle green background
+                                                    )
+                                                    .padding(.top, 10)
+                                            } else {
+                                                Text("offline")
+                                                    .font(.caption)
+                                                    .foregroundColor(.red)
+                                                    .padding(.vertical, 5) // Add some padding inside the label
+                                                    .padding(.horizontal, 10)
+                                                    .background(
+                                                        RoundedRectangle(cornerRadius: 10)
+                                                            .fill(Color.red.opacity(0.2)) // Use a subtle green background
+                                                    )
+                                                    .padding(.top, 10)
+                                            }
+                                        } else {
+                                            ProgressView().scaleEffect(0.8)
+                                        }
+                                        
+                                        
+                                        
                                     }
                                     .padding()
                                     .background(
@@ -129,7 +163,7 @@ struct UserHome: View {
                                     )
                                 }
                             }
-
+                            
                             // Add new device button
                             NavigationLink(destination: MeterSettings()) {
                                 VStack {
@@ -154,20 +188,27 @@ struct UserHome: View {
                     .refreshable {
                         loadDevicesFromServer()
                     }
-
+                    
                 }
                 
-                if(waitingForServerResponse) {
+                if waitingForServerResponse {
                     ProgressSpinner(progressText: waitMessage)
+                } else {
+                    if !mqttmanager.isMqttConnected {
+                        ProgressSpinner(progressText: "Waiting for cloud connection...")
+                    } else if !mqttmanager.isMqttSubscribed {
+                        ProgressSpinner(progressText: "Connected! Waiting for data")
+                    }
                 }
-
+                
+                
                 Text("WattWise, Copyright © 2025")
                     .font(.footnote)
                     .foregroundColor(.gray)
                     .padding(.top, 10)
             }
             .padding(.top)
-            //.navigationBarTitleDisplayMode(.inline) // Keeps the title inline
+            .navigationBarTitleDisplayMode(.inline) // Keeps the title inline
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarLeading) {
@@ -221,14 +262,34 @@ struct UserHome: View {
                 .presentationDetents([.fraction(0.3)])
             }
             .onAppear {
+                print("UserHome: onAppear")
+                if navigationManager.lastVisitedView == "Root" { // first landing on UserHome
+                    print("came from Root")
+                    DispatchQueue.global().async {
+                        mqttmanager.connectToMqtt()
+                    }
+                }
                 loadDevicesLocally()
                 print(devices.count)
+                navigationManager.lastVisitedView = "UserHome"
+            }
+            .onChange(of: scenePhase) { newPhase in
+                print("UserHome: \(newPhase)")
+                if newPhase == .active {
+                    DispatchQueue.global().async {
+                        mqttmanager.connectToMqtt()
+                    }
+                }
+                if newPhase == .inactive {
+                    DispatchQueue.global().async {
+                        mqttmanager.disconnectMQTT()
+                    }
+                }
             }
         }
     }
     
     private func loadDevicesLocally() {
-        print("UserHome: onAppear: Loading devices locally")
         guard let savedData = UserDefaults.standard.data(forKey: "savedDevices") else {
             print("No saved devices found in UserDefaults.")
             devices = []
@@ -237,12 +298,10 @@ struct UserHome: View {
         
         do {
             devices = try JSONDecoder().decode([Device].self, from: savedData)
-            print("Decoded devices count: \(devices.count)")
             if devices.isEmpty {
                 errorMessage = "No saved devices."
                 loadDevicesFromServer()
             }
-            print("Devices retrieved successfully from UserDefaults.")
         } catch {
             print("Failed to decode devices from UserDefaults: \(error.localizedDescription)")
             devices = []
@@ -330,11 +389,6 @@ struct UserHome: View {
             }
             
         }.resume()
-//        
-//        // Ensure this does not interfere with the data fetch
-//        DispatchQueue.global().async {
-//            mqttmanager.configureMQTT()
-//        }
     }
     
     func updateDeviceName(deviceID: String, deviceName: String) {
@@ -344,17 +398,17 @@ struct UserHome: View {
             print("Invalid URL")
             return
         }
-
+        
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
+        
         let parameters: [String: String] = [
             "user_id": user_id,
             "device_id": deviceID,
             "device_name": deviceName
         ]
-
+        
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: parameters, options: [])
         } catch {
@@ -362,7 +416,7 @@ struct UserHome: View {
             waitingForServerResponse = false
             return
         }
-
+        
         let session = URLSession.shared
         session.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
@@ -371,19 +425,19 @@ struct UserHome: View {
                     waitingForServerResponse = false
                     return
                 }
-
+                
                 guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
                     waitingForServerResponse = false
                     print("Failed to update device name: Invalid response")
                     return
                 }
-
+                
                 guard let data = data else {
                     waitingForServerResponse = false
                     print("No data received from server")
                     return
                 }
-
+                
                 do {
                     if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
                        let message = json["message"] as? String {
@@ -402,7 +456,7 @@ struct UserHome: View {
             }
         }.resume()
     }
-
+    
     
     func deleteDeviceFromServer(device: Device) {
         waitingForServerResponse = true
