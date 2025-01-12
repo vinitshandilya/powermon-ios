@@ -25,9 +25,18 @@
 		C79C3EB228DF2FD900EE8EAE /* CocoaMQTTWebSocket in Frameworks */ = {isa = PBXBuildFile; productRef = C79C3EB128DF2FD900EE8EAE /* CocoaMQTTWebSocket */; };
 		C79C3EB428DF33D400EE8EAE /* MQTTManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C3EB328DF33D400EE8EAE /* MQTTManager.swift */; };
 		C79C3EB828DF353200EE8EAE /* MQTTReading.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C3EB728DF353200EE8EAE /* MQTTReading.swift */; };
+		C7A3A3322D339631001D1FFC /* AppSettingsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A3A3312D339631001D1FFC /* AppSettingsTab.swift */; };
+		C7A3A3342D339664001D1FFC /* AnalyticsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A3A3332D339664001D1FFC /* AnalyticsTab.swift */; };
+		C7A3A3362D3396A6001D1FFC /* AutomationsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A3A3352D3396A6001D1FFC /* AutomationsTab.swift */; };
+		C7A3A3382D33B93D001D1FFC /* TileIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A3A3372D33B93D001D1FFC /* TileIcon.swift */; };
+		C7A3A33A2D33C152001D1FFC /* TabItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A3A3392D33C152001D1FFC /* TabItem.swift */; };
+		C7A3A33C2D340346001D1FFC /* HomeTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A3A33B2D340346001D1FFC /* HomeTab.swift */; };
 		C7BE9AF52D2D0483007D8DB7 /* ScrollableLineChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7BE9AF42D2D0483007D8DB7 /* ScrollableLineChartView.swift */; };
 		C7BE9AF72D2D5E81007D8DB7 /* EnergyChartViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7BE9AF62D2D5E81007D8DB7 /* EnergyChartViewModel.swift */; };
 		C7BE9AF92D2D9C37007D8DB7 /* TimeFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7BE9AF82D2D9C37007D8DB7 /* TimeFormatter.swift */; };
+		C7D2A96C2D3219FA00ADC263 /* DeviceButtonTile.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7D2A96B2D3219FA00ADC263 /* DeviceButtonTile.swift */; };
+		C7D2A9722D3229DC00ADC263 /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7D2A9712D3229DC00ADC263 /* Card.swift */; };
+		C7D2A9742D325D6800ADC263 /* AddNewDeviceButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7D2A9732D325D6800ADC263 /* AddNewDeviceButton.swift */; };
 		C7DD59432D1B2DF30025C547 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DD59422D1B2DF30025C547 /* LoginView.swift */; };
 		C7DD59452D1B2E320025C547 /* CreateAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DD59442D1B2E320025C547 /* CreateAccountView.swift */; };
 		C7DD59472D1B31680025C547 /* UserHome.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DD59462D1B31680025C547 /* UserHome.swift */; };
@@ -54,9 +63,18 @@
 		C79C3EA728DF2FA100EE8EAE /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		C79C3EB328DF33D400EE8EAE /* MQTTManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MQTTManager.swift; sourceTree = "<group>"; };
 		C79C3EB728DF353200EE8EAE /* MQTTReading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MQTTReading.swift; sourceTree = "<group>"; };
+		C7A3A3312D339631001D1FFC /* AppSettingsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsTab.swift; sourceTree = "<group>"; };
+		C7A3A3332D339664001D1FFC /* AnalyticsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsTab.swift; sourceTree = "<group>"; };
+		C7A3A3352D3396A6001D1FFC /* AutomationsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutomationsTab.swift; sourceTree = "<group>"; };
+		C7A3A3372D33B93D001D1FFC /* TileIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileIcon.swift; sourceTree = "<group>"; };
+		C7A3A3392D33C152001D1FFC /* TabItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabItem.swift; sourceTree = "<group>"; };
+		C7A3A33B2D340346001D1FFC /* HomeTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTab.swift; sourceTree = "<group>"; };
 		C7BE9AF42D2D0483007D8DB7 /* ScrollableLineChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableLineChartView.swift; sourceTree = "<group>"; };
 		C7BE9AF62D2D5E81007D8DB7 /* EnergyChartViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnergyChartViewModel.swift; sourceTree = "<group>"; };
 		C7BE9AF82D2D9C37007D8DB7 /* TimeFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeFormatter.swift; sourceTree = "<group>"; };
+		C7D2A96B2D3219FA00ADC263 /* DeviceButtonTile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceButtonTile.swift; sourceTree = "<group>"; };
+		C7D2A9712D3229DC00ADC263 /* Card.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Card.swift; sourceTree = "<group>"; };
+		C7D2A9732D325D6800ADC263 /* AddNewDeviceButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddNewDeviceButton.swift; sourceTree = "<group>"; };
 		C7DD59422D1B2DF30025C547 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		C7DD59442D1B2E320025C547 /* CreateAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountView.swift; sourceTree = "<group>"; };
 		C7DD59462D1B31680025C547 /* UserHome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserHome.swift; sourceTree = "<group>"; };
@@ -104,6 +122,7 @@
 				C7DD59422D1B2DF30025C547 /* LoginView.swift */,
 				C7DD59442D1B2E320025C547 /* CreateAccountView.swift */,
 				C7DD59462D1B31680025C547 /* UserHome.swift */,
+				C7D2A96B2D3219FA00ADC263 /* DeviceButtonTile.swift */,
 				C7DD59482D1BBF9B0025C547 /* DeviceDetails.swift */,
 				C705FF462D23C38F00781E1E /* SetLevelsDialog.swift */,
 				C79C3EB328DF33D400EE8EAE /* MQTTManager.swift */,
@@ -122,6 +141,14 @@
 				C7BE9AF82D2D9C37007D8DB7 /* TimeFormatter.swift */,
 				C724AF702D304C00003B65B9 /* NavigationManager.swift */,
 				C738E2F02D31A12E00D8381A /* SnackBar.swift */,
+				C7D2A9712D3229DC00ADC263 /* Card.swift */,
+				C7D2A9732D325D6800ADC263 /* AddNewDeviceButton.swift */,
+				C7A3A3312D339631001D1FFC /* AppSettingsTab.swift */,
+				C7A3A3332D339664001D1FFC /* AnalyticsTab.swift */,
+				C7A3A3352D3396A6001D1FFC /* AutomationsTab.swift */,
+				C7A3A3372D33B93D001D1FFC /* TileIcon.swift */,
+				C7A3A3392D33C152001D1FFC /* TabItem.swift */,
+				C7A3A33B2D340346001D1FFC /* HomeTab.swift */,
 			);
 			path = Powermon;
 			sourceTree = "<group>";
@@ -213,14 +240,21 @@
 			files = (
 				C7E474A22D1D4355009BBA26 /* Device.swift in Sources */,
 				C79C3EA328DF2F9F00EE8EAE /* ContentView.swift in Sources */,
+				C7D2A9722D3229DC00ADC263 /* Card.swift in Sources */,
 				C72716422D2A47F7007292B3 /* CustomBarChart.swift in Sources */,
+				C7D2A9742D325D6800ADC263 /* AddNewDeviceButton.swift in Sources */,
 				C7E961D82D21596D00EABB9E /* Config.swift in Sources */,
 				C77BF4462D1FDCFE00CB8A67 /* MeterSettings.swift in Sources */,
 				C79C3EB428DF33D400EE8EAE /* MQTTManager.swift in Sources */,
+				C7A3A33C2D340346001D1FFC /* HomeTab.swift in Sources */,
+				C7A3A3382D33B93D001D1FFC /* TileIcon.swift in Sources */,
+				C7A3A3342D339664001D1FFC /* AnalyticsTab.swift in Sources */,
+				C7A3A33A2D33C152001D1FFC /* TabItem.swift in Sources */,
 				C7DD59452D1B2E320025C547 /* CreateAccountView.swift in Sources */,
 				C705FF452D23027D00781E1E /* RingWidgetTable.swift in Sources */,
 				C7BE9AF52D2D0483007D8DB7 /* ScrollableLineChartView.swift in Sources */,
 				C724AF712D304C00003B65B9 /* NavigationManager.swift in Sources */,
+				C7A3A3362D3396A6001D1FFC /* AutomationsTab.swift in Sources */,
 				C77DBA2E2D25722900C5D5BC /* EnergyReading.swift in Sources */,
 				C79C3EB828DF353200EE8EAE /* MQTTReading.swift in Sources */,
 				C7DD59472D1B31680025C547 /* UserHome.swift in Sources */,
@@ -232,6 +266,8 @@
 				C72716442D2AB8E9007292B3 /* NotificationBadge.swift in Sources */,
 				C7DD59492D1BBF9B0025C547 /* DeviceDetails.swift in Sources */,
 				C738E2F12D31A12E00D8381A /* SnackBar.swift in Sources */,
+				C7A3A3322D339631001D1FFC /* AppSettingsTab.swift in Sources */,
+				C7D2A96C2D3219FA00ADC263 /* DeviceButtonTile.swift in Sources */,
 				C7DD59432D1B2DF30025C547 /* LoginView.swift in Sources */,
 				C79C3EA128DF2F9F00EE8EAE /* PowermonApp.swift in Sources */,
 			);

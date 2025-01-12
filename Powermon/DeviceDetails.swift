@@ -117,8 +117,8 @@ struct DeviceDetails: View {
             print("DeviceDetails: onAppear")
             print("device publishing on topic: \(device.publish_topic)")
             print("device subscribed on topic: \(device.subscribe_topic)")
-            // Load usage chart only when coming from UserHome!
-            if navigationManager.lastVisitedView == "UserHome" {
+            // Load usage chart only when coming from HomeTab!
+            if navigationManager.lastVisitedView == "HomeTab" {
                 DispatchQueue.global().async {
                     energyChartViewModel.fetchReadings(userId: user_id, deviceId: device.device_id)
                 }
@@ -197,12 +197,7 @@ struct DeviceDetails: View {
                 }
             }
         }
-            .frame(width: UIScreen.main.bounds.width * 0.9, height: 300)
-        //            .background(
-        //                RoundedRectangle(cornerRadius: 10) // Rounded rectangle as background
-        //                    .fill(Color("CardBg")) // Card color
-        //                    .shadow(color: .black.opacity(0.3), radius: 5, x: 0, y: 5) // Add shadow
-        //            )
+        .frame(width: UIScreen.main.bounds.width * 0.9, height: 300)
         
         return view
     }

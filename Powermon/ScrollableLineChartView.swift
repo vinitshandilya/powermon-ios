@@ -75,7 +75,7 @@ struct ScrollableLineChartView: View {
                         }
                     }
                 }
-                .frame(width: max(CGFloat(usages.count) * 50, UIScreen.main.bounds.width), height: 300)
+                .frame(width: max(CGFloat(usages.count) * 50, UIScreen.main.bounds.width), height: 200)
             }
         }
         .frame(maxWidth: .infinity)

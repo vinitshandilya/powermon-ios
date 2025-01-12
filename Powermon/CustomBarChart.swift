@@ -7,7 +7,7 @@ struct CustomBarChart: View {
     
     var body: some View {
         let maxPower = usages.map(\.power).max() ?? 1 // Avoid division by zero
-        let scaleFactor: CGFloat = 130.0 / CGFloat(maxPower) // Chart area height
+        let scaleFactor: CGFloat = 100.0 / CGFloat(maxPower) // Chart area height
         
         GeometryReader { geometry in
             let dynamicSpacing = max(11, geometry.size.width / CGFloat(usages.count) * 0.1) // Adjust spacing dynamically

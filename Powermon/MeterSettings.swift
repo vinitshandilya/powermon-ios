@@ -2,6 +2,8 @@ import SwiftUI
 
 struct MeterSettings: View {
     @Environment(\.scenePhase) var scenePhase
+    @EnvironmentObject var navigationManager: NavigationManager
+    @Environment(\.dismiss) private var dismiss
     @State private var broker: String = Config.broker
     @State private var port: String = Config.brokerPort
     @State private var user_id: String = UserDefaults.standard.string(forKey: "user_id") ?? ""
@@ -28,6 +30,7 @@ struct MeterSettings: View {
     var body: some View {
         ScrollView {
             Image(systemName: "house.badge.wifi.fill")
+                .renderingMode(.original)
                 .resizable()
                 .scaledToFit()
                 .frame(width: 100, height: 100)
@@ -200,10 +203,25 @@ struct MeterSettings: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding()
         }
+        .navigationTitle("")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            // Custom back button
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    dismiss()
+                }) {
+                    Image(systemName: "arrow.left")
+                        .foregroundColor(Color.primary)
+                }
+            }
+        }
         .onAppear {
             print("onAppear")
             loadDevicesLocally()
             addNewDevice()
+            navigationManager.lastVisitedView = "MeterSettings"
         }
         .onChange(of: scenePhase) { newPhase in
             print(newPhase)
@@ -242,7 +260,6 @@ struct MeterSettings: View {
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 DispatchQueue.main.async {
-                    // errorMessage = "Error: \(error.localizedDescription)"
                     nodeServerError = "Error: \(error.localizedDescription)"
                     waitingForNodeServer = false
                 }
@@ -369,7 +386,6 @@ struct MeterSettings: View {
                 if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
                     submitMessage = SubmitMessage(text: "Configuration submitted successfully.")
                     print("restarting mqtt client on ios")
-                    // mqttmanager.configureMQTT() // restart mqtt client on ios for saved settings to take effect
                 } else {
                     submitMessage = SubmitMessage(text: "Failed to submit configuration.")
                 }
@@ -378,15 +394,9 @@ struct MeterSettings: View {
     }
     
     func saveLocalSettings() {
-        // save local settings
         UserDefaults.standard.set(ssid, forKey: "ssid")
         UserDefaults.standard.set(password, forKey: "password")
         UserDefaults.standard.set(autoreconnect, forKey: "autoreconnect")
-        
-        
-        // restart mqtt instance to use saved settings
-//        mqttmanager.updateTopics(pub: device.publish_topic, sub: device.subscribe_topic)
-//        mqttmanager.configureMQTT()
     }
     
     func testESPReachability() {

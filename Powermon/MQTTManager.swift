@@ -11,13 +11,6 @@ class MQTTManager: CocoaMQTTDelegate, ObservableObject {
     let port = Config.brokerPort
     let mqttuser = Config.mqttuser
     let mqttpassword = Config.mqttpassword
-//    var publishtopic: String = ""
-//    var subscribetopic: String = ""
-    
-//    func updateTopics(pub: String, sub: String) {
-//        self.publishtopic = pub
-//        self.subscribetopic = sub
-//    }
     
     func connectToMqtt() { // connect to broker
         staticMQTT.mqttClient = CocoaMQTT(clientID: clientID, host: host, port: UInt16(port)!) // TODO: Do not force unwrap!
